@@ -1,33 +1,33 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Filename: main.cpp
 ////////////////////////////////////////////////////////////////////////////////
-#include "GameSystem\GameSystem.h"
+#include "../NashDXEngine/GameSystem/System.h"
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-	GameSystem* System;
+	System* system;
 	bool result;
 
 
 	// Create the system object.
-	System = new GameSystem;
-	if (!System)
+	system = new System;
+	if (!system)
 	{
 		return 0;
 	}
 
 	// Initialize and run the system object.
-	result = System->Initialize();
+	result = system->Initialize();
 	if (result)
 	{
-		System->Run();
+		system->Run();
 	}
 
 	// Shutdown and release the system object.
-	System->Shutdown();
-	delete System;
-	System = 0;
+	system->Shutdown();
+	delete system;
+	system = 0;
 
 	return 0;
 }

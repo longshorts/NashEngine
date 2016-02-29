@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Filename: GameSystem.h
+// Filename: System.h
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef _GameSystem_H_
-#define _GameSystem_H_
+#ifndef _System_H_
+#define _System_H_
 
 
 ///////////////////////////////
@@ -20,18 +20,18 @@
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
-#include "applicationclass.h"
+//#include "application.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Class name: GameSystem
+// Class name: System
 ////////////////////////////////////////////////////////////////////////////////
-class GameSystem
+class System
 {
 public:
-	GameSystem();
-	GameSystem(const GameSystem&);
-	~GameSystem();
+	System();
+	System(const System&);
+	~System();
 
 	bool Initialize();
 	void Shutdown();
@@ -48,7 +48,7 @@ private:
 	LPCWSTR m_applicationName;
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
-	ApplicationClass* m_Application;
+	//Application* m_Application;
 };
 
 
@@ -61,7 +61,7 @@ static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 /////////////
 // GLOBALS //
 /////////////
-static GameSystem* ApplicationHandle = 0;
+static System* ApplicationHandle = 0;
 
 
 #endif

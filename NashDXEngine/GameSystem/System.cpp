@@ -1,26 +1,26 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Filename: GameSystem.cpp
+// Filename: System.cpp
 ////////////////////////////////////////////////////////////////////////////////
-#include "GameSystem.h"
+#include "System.h"
 
 
-GameSystem::GameSystem()
+System::System()
 {
-	m_Application = 0;
+	//m_Application = 0;
 }
 
 
-GameSystem::GameSystem(const GameSystem& other)
-{
-}
-
-
-GameSystem::~GameSystem()
+System::System(const System& other)
 {
 }
 
 
-bool GameSystem::Initialize()
+System::~System()
+{
+}
+
+
+bool System::Initialize()
 {
 	int screenWidth, screenHeight;
 	bool result;
@@ -34,8 +34,8 @@ bool GameSystem::Initialize()
 	InitializeWindows(screenWidth, screenHeight);
 
 	// Create the application wrapper object.
-	m_Application = new ApplicationClass;
-	if (!m_Application)
+	//m_Application = new Application;
+	/*if (!m_Application)
 	{
 		return false;
 	}
@@ -45,21 +45,21 @@ bool GameSystem::Initialize()
 	if (!result)
 	{
 		return false;
-	}
+	}*/
 
 	return true;
 }
 
 
-void GameSystem::Shutdown()
+void System::Shutdown()
 {
 	// Release the application wrapper object.
-	if (m_Application)
+	/*if (m_Application)
 	{
 		m_Application->Shutdown();
 		delete m_Application;
 		m_Application = 0;
-	}
+	}*/
 
 	// Shutdown the window.
 	ShutdownWindows();
@@ -68,7 +68,7 @@ void GameSystem::Shutdown()
 }
 
 
-void GameSystem::Run()
+void System::Run()
 {
 	MSG msg;
 	bool done, result;
@@ -109,29 +109,29 @@ void GameSystem::Run()
 }
 
 
-bool GameSystem::Frame()
+bool System::Frame()
 {
 	bool result;
 
 
 	// Do the frame processing for the application object.
-	result = m_Application->Frame();
+	/*result = m_Application->Frame();
 	if (!result)
 	{
 		return false;
-	}
+	}*/
 
 	return true;
 }
 
 
-LRESULT CALLBACK GameSystem::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
 	return DefWindowProc(hwnd, umsg, wparam, lparam);
 }
 
 
-void GameSystem::InitializeWindows(int& screenWidth, int& screenHeight)
+void System::InitializeWindows(int& screenWidth, int& screenHeight)
 {
 	WNDCLASSEX wc;
 	DEVMODE dmScreenSettings;
@@ -169,7 +169,8 @@ void GameSystem::InitializeWindows(int& screenWidth, int& screenHeight)
 	screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 	// Setup the screen settings depending on whether it is running in full screen or in windowed mode.
-	if (FULL_SCREEN)
+	//if (FULL_SCREEN)
+	if(false)
 	{
 		// If full screen set the screen to maximum size of the users desktop and 32bit.
 		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
@@ -213,13 +214,14 @@ void GameSystem::InitializeWindows(int& screenWidth, int& screenHeight)
 }
 
 
-void GameSystem::ShutdownWindows()
+void System::ShutdownWindows()
 {
 	// Show the mouse cursor.
 	ShowCursor(true);
 
 	// Fix the display settings if leaving full screen mode.
-	if (FULL_SCREEN)
+	//if (FULL_SCREEN)
+	if(false)
 	{
 		ChangeDisplaySettings(NULL, 0);
 	}
