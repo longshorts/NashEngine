@@ -20,7 +20,7 @@
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
-//#include "application.h"
+#include "Application.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,8 @@ private:
 	LPCWSTR m_applicationName;
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
-	//Application* m_Application;
+	Application* m_Application;
+	InputManager* m_InputManager;
 };
 
 

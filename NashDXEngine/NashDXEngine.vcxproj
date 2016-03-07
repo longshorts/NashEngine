@@ -138,10 +138,14 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameSystem\Application.h" />
     <ClInclude Include="GameSystem\System.h" />
+    <ClInclude Include="GameSystem\InputManager\InputManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GameSystem\Application.cpp" />
     <ClCompile Include="GameSystem\System.cpp" />
+    <ClCompile Include="GameSystem\InputManager\InputManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

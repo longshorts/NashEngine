@@ -6,7 +6,8 @@
 
 System::System()
 {
-	//m_Application = 0;
+	m_Application = 0;
+	m_InputManager = 0;
 }
 
 
@@ -33,19 +34,34 @@ bool System::Initialize()
 	// Initialize the windows api.
 	InitializeWindows(screenWidth, screenHeight);
 
+	// Create the input object.  This object will be used to handle reading the keyboard input from the user.
+	m_InputManager = new InputManager;
+	if (!m_InputManager)
+	{
+		return false;
+	}
+
+	// Initialize the input object.
+	result = m_InputManager->Initialize(m_hinstance, m_hwnd, screenWidth, screenHeight);
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the input object.", L"Error", MB_OK);
+		return false;
+	}
+
 	// Create the application wrapper object.
-	//m_Application = new Application;
-	/*if (!m_Application)
+	m_Application = new Application;
+	if (!m_Application)
 	{
 		return false;
 	}
 
 	// Initialize the application wrapper object.
-	result = m_Application->Initialize(m_hinstance, m_hwnd, screenWidth, screenHeight);
+	result = m_Application->Initialize(screenWidth, screenHeight, m_hwnd);
 	if (!result)
 	{
 		return false;
-	}*/
+	}
 
 	return true;
 }
@@ -54,12 +70,20 @@ bool System::Initialize()
 void System::Shutdown()
 {
 	// Release the application wrapper object.
-	/*if (m_Application)
+	if (m_Application)
 	{
 		m_Application->Shutdown();
 		delete m_Application;
 		m_Application = 0;
-	}*/
+	}
+
+	// Release the input object.
+	if (m_InputManager)
+	{
+		m_InputManager->Shutdown();
+		delete m_InputManager;
+		m_InputManager = 0;
+	}
 
 	// Shutdown the window.
 	ShutdownWindows();
@@ -103,6 +127,16 @@ void System::Run()
 			}
 		}
 
+		if (m_InputManager->IsButtonDown(DIK_ESCAPE) == true) {
+			done = true;
+		}
+
+		// Check if the user pressed escape and wants to quit.
+		/*if (m_InputManager->IsEscapePressed() == true)
+		{
+			done = true;
+		}*/
+
 	}
 
 	return;
@@ -113,13 +147,20 @@ bool System::Frame()
 {
 	bool result;
 
-
-	// Do the frame processing for the application object.
-	/*result = m_Application->Frame();
+	// Do the input frame processing.
+	result = m_InputManager->Frame();
 	if (!result)
 	{
 		return false;
-	}*/
+	}
+
+	// Do the frame processing for the application object.
+	//TODO Add FPS, CPU, FRAMETIME
+	result = m_Application->Frame(0,0,0);
+	if (!result)
+	{
+		return false;
+	}
 
 	return true;
 }
