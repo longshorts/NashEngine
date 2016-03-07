@@ -3,9 +3,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "InputManager.h"
 
+InputManager* InputManager::instance;
 
 InputManager::InputManager()
 {
+	if (instance) {
+		delete this;
+	}
+	else instance = this;
+
 	m_directInput = 0;
 	m_keyboard = 0;
 	m_mouse = 0;
@@ -19,6 +25,8 @@ InputManager::InputManager(const InputManager& other)
 
 InputManager::~InputManager()
 {
+	Shutdown();
+	instance = 0;
 }
 
 
@@ -222,138 +230,6 @@ void InputManager::ProcessInput()
 }
 
 
-/*bool InputManager::IsEscapePressed()
-{
-	// Do a bitwise and on the keyboard state to check if the escape key is currently being pressed.
-	if (m_keyboardState[DIK_ESCAPE] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsLeftArrowPressed()
-{
-	if (m_keyboardState[DIK_LEFT] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-
-bool InputManager::IsRightArrowPressed()
-{
-	if (m_keyboardState[DIK_RIGHT] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsUpArrowPressed()
-{
-	if (m_keyboardState[DIK_UP] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsDownArrowPressed()
-{
-	if (m_keyboardState[DIK_DOWN] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsWKeyPressed()
-{
-	if (m_keyboardState[DIK_W] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsSKeyPressed()
-{
-	if (m_keyboardState[DIK_S] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsAKeyPressed()
-{
-	if (m_keyboardState[DIK_A] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsDKeyPressed()
-{
-	if (m_keyboardState[DIK_D] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsPKeyPressed()
-{
-	if (m_keyboardState[DIK_P] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsOKeyPressed()
-{
-	if (m_keyboardState[DIK_O] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsLKeyPressed()
-{
-	if (m_keyboardState[DIK_L] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsKKeyPressed()
-{
-	if (m_keyboardState[DIK_K] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}*/
-
 void InputManager::GetMouseLocation(int& mouseX, int& mouseY)
 {
 	mouseX = m_mouseX;
@@ -363,17 +239,6 @@ void InputManager::GetMouseLocation(int& mouseX, int& mouseY)
 
 bool InputManager::IsButtonDown(unsigned int btn) {
 	if (m_keyboardState[btn] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool InputManager::IsEscapePressed()
-{
-	// Do a bitwise and on the keyboard state to check if the escape key is currently being pressed.
-	if (m_keyboardState[DIK_ESCAPE] & 0x80)
 	{
 		return true;
 	}

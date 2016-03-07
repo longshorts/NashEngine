@@ -30,6 +30,11 @@
 class InputManager
 {
 public:
+	static InputManager* getInstance()
+	{
+		return instance;
+	}
+
 	InputManager();
 	InputManager(const InputManager&);
 	~InputManager();
@@ -40,21 +45,7 @@ public:
 
 	bool IsButtonDown(unsigned int);
 
-	
 	void GetMouseLocation(int&, int&);
-	bool IsEscapePressed();
-	/*bool IsLeftArrowPressed();
-	bool IsRightArrowPressed();
-	bool IsUpArrowPressed();
-	bool IsDownArrowPressed();
-	bool IsWKeyPressed();
-	bool IsSKeyPressed();
-	bool IsAKeyPressed();
-	bool IsDKeyPressed();
-	bool IsPKeyPressed();
-	bool IsOKeyPressed();
-	bool IsLKeyPressed();
-	bool IsKKeyPressed();*/
 
 private:
 	bool ReadKeyboard();
@@ -62,6 +53,9 @@ private:
 	void ProcessInput();
 
 private:
+	static InputManager* instance;
+
+
 	IDirectInput8* m_directInput;
 	IDirectInputDevice8* m_keyboard;
 	IDirectInputDevice8* m_mouse;
@@ -73,4 +67,36 @@ private:
 	int m_mouseX, m_mouseY;
 };
 
+
 #endif
+
+//SINGLETON TEMPLATE
+/*static InputManager* Instance()
+{
+	return instance;
+}
+
+private:
+	static InputManager* instance;
+
+
+	InputManager* InputManager::instance;
+
+	InputManager::InputManger()
+	{
+		if (instance)
+		{
+			delete this;
+		}
+		else instance = this;
+	}
+
+	InputManager::~InputManager()
+	{
+		Terminate();
+		instance = 0;
+	}
+
+instance.ProcessInput() // Reference
+instance->ProcessInput() // Pointer
+*/

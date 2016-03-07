@@ -49,7 +49,6 @@ private:
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
 	Application* m_Application;
-	InputManager* m_InputManager;
 };
 
 

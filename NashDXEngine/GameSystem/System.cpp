@@ -7,7 +7,6 @@
 System::System()
 {
 	m_Application = 0;
-	m_InputManager = 0;
 }
 
 
@@ -26,6 +25,8 @@ bool System::Initialize()
 	int screenWidth, screenHeight;
 	bool result;
 
+	//Initialize singletons
+	new InputManager();
 
 	// Initialize the width and height of the screen to zero before sending the variables into the function.
 	screenWidth = 0;
@@ -34,15 +35,8 @@ bool System::Initialize()
 	// Initialize the windows api.
 	InitializeWindows(screenWidth, screenHeight);
 
-	// Create the input object.  This object will be used to handle reading the keyboard input from the user.
-	m_InputManager = new InputManager;
-	if (!m_InputManager)
-	{
-		return false;
-	}
-
 	// Initialize the input object.
-	result = m_InputManager->Initialize(m_hinstance, m_hwnd, screenWidth, screenHeight);
+	result = InputManager::getInstance()->Initialize(m_hinstance, m_hwnd, screenWidth, screenHeight);
 	if (!result)
 	{
 		MessageBox(m_hwnd, L"Could not initialize the input object.", L"Error", MB_OK);
@@ -75,14 +69,6 @@ void System::Shutdown()
 		m_Application->Shutdown();
 		delete m_Application;
 		m_Application = 0;
-	}
-
-	// Release the input object.
-	if (m_InputManager)
-	{
-		m_InputManager->Shutdown();
-		delete m_InputManager;
-		m_InputManager = 0;
 	}
 
 	// Shutdown the window.
@@ -127,7 +113,7 @@ void System::Run()
 			}
 		}
 
-		if (m_InputManager->IsButtonDown(DIK_ESCAPE) == true) {
+		if (InputManager::getInstance()->IsButtonDown(DIK_ESCAPE) == true) {
 			done = true;
 		}
 
@@ -148,7 +134,7 @@ bool System::Frame()
 	bool result;
 
 	// Do the input frame processing.
-	result = m_InputManager->Frame();
+	result = InputManager::getInstance()->Frame();
 	if (!result)
 	{
 		return false;
