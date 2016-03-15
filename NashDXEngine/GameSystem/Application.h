@@ -20,9 +20,11 @@
 #include "particleshaderclass.h"
 #include "particlesystemclass.h"*/
 
+#include "Camera\Camera.h"
 #include "InputManager\InputManager.h"
 #include "Direct3DManager\D3DManager.h"
 #include "FPSManager\FPSManager.h"
+#include "TimerManager\TimerManager.h"
 
 #include <Windows.h>
 
@@ -65,7 +67,7 @@ private:
 	FireShaderClass* m_FireShader;
 	ParticleShaderClass* m_ParticleShader;
 	ParticleSystemClass* m_ParticleSystem;*/
-	InputManager* m_InputManager;
+	Camera* m_Camera;
 
 	bool enableParticleSystem;
 	bool enableAdditiveBlending;

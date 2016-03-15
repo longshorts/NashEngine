@@ -23,8 +23,6 @@ Application::Application()
 
 	enableParticleSystem = false;
 	enableAdditiveBlending = false;*/
-
-	m_InputManager = 0;
 }
 
 
@@ -41,29 +39,39 @@ Application::~Application()
 bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
-	/*D3DXMATRIX baseViewMatrix;
+	//D3DXMATRIX baseViewMatrix;
 
-	// Create the Direct3D object.
-	m_D3D = new D3DManager;
-	if (!m_D3D)
-	{
+	// Initialize the Direct3D singleton.
+	new D3DManager();
+	if (!D3DManager::getInstance())
 		return false;
-	}*/
 
-	// Initialize the Direct3D object.
-	/*result = m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
-	if (!result)
-	{
+	result = D3DManager::getInstance()->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	if (!result) {
 		MessageBox(hwnd, L"Could not initialize Direct3D.", L"Error", MB_OK);
 		return false;
-	}*/
+	}
+
 
 	// Create the camera object.
-	/*m_Camera = new Camera;
+	m_Camera = new Camera;
 	if (!m_Camera)
 	{
 		return false;
-	}*/
+	}
+
+	//Initialize the Timer singleton
+	new TimerManager();
+	if (!TimerManager::getInstance())
+		return false;
+
+	result = TimerManager::getInstance()->Initialize();
+	if (!result) {
+		MessageBox(hwnd, L"Could not initialize TimerManager.", L"Error", MB_OK);
+		return false;
+	}
+
+	//Initialize the FPS singleton
 
 	// Create the position object.
 	/*m_Position = new PositionClass;
@@ -307,7 +315,7 @@ void Application::Shutdown()
 	{
 		delete m_Position;
 		m_Position = 0;
-	}
+	}*/
 
 	// Release the camera object.
 	if (m_Camera)
@@ -317,12 +325,8 @@ void Application::Shutdown()
 	}
 
 	// Release the D3D object.
-	if (m_D3D)
-	{
-		m_D3D->Shutdown();
-		delete m_D3D;
-		m_D3D = 0;
-	}*/
+	if (D3DManager::getInstance())
+		D3DManager::getInstance()->Shutdown();
 
 	return;
 }

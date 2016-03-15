@@ -171,6 +171,12 @@
     <ClCompile Include="GameSystem\InputManager\InputManager.cpp" />
     <ClCompile Include="GameSystem\TimerManager\TimerManager.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\color.ps" />
+    <None Include="Shaders\color.vs" />
+    <None Include="Shaders\font.ps" />
+    <None Include="Shaders\font.vs" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
