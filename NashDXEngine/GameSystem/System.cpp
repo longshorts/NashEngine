@@ -27,6 +27,8 @@ bool System::Initialize()
 
 	//Initialize singletons
 	new InputManager();
+	new D3DManager();
+	new FPSManager();
 
 	// Initialize the width and height of the screen to zero before sending the variables into the function.
 	screenWidth = 0;

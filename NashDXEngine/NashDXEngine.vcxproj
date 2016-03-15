@@ -69,7 +69,22 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include;</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(IncludePath);$(DXSDK_DIR)Include;</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
@@ -139,13 +154,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameSystem\Application.h" />
+    <ClInclude Include="GameSystem\Camera\Camera.h" />
+    <ClInclude Include="GameSystem\Direct3DManager\D3DManager.h" />
+    <ClInclude Include="GameSystem\FPSManager\FPSManager.h" />
+    <ClInclude Include="GameSystem\Manager.h" />
     <ClInclude Include="GameSystem\System.h" />
     <ClInclude Include="GameSystem\InputManager\InputManager.h" />
+    <ClInclude Include="GameSystem\TimerManager\TimerManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameSystem\Application.cpp" />
+    <ClCompile Include="GameSystem\Camera\Camera.cpp" />
+    <ClCompile Include="GameSystem\Direct3DManager\D3DManager.cpp" />
+    <ClCompile Include="GameSystem\FPSManager\FPSManager.cpp" />
     <ClCompile Include="GameSystem\System.cpp" />
     <ClCompile Include="GameSystem\InputManager\InputManager.cpp" />
+    <ClCompile Include="GameSystem\TimerManager\TimerManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

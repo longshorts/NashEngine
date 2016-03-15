@@ -44,7 +44,7 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	/*D3DXMATRIX baseViewMatrix;
 
 	// Create the Direct3D object.
-	m_D3D = new D3DClass;
+	m_D3D = new D3DManager;
 	if (!m_D3D)
 	{
 		return false;
@@ -59,7 +59,7 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}*/
 
 	// Create the camera object.
-	/*m_Camera = new CameraClass;
+	/*m_Camera = new Camera;
 	if (!m_Camera)
 	{
 		return false;

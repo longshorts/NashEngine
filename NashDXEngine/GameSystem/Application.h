@@ -8,8 +8,8 @@
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
-/*#include "d3dclass.h"
-#include "cameraclass.h"
+/*#include "D3DManager.h"
+#include "Camera.h"
 #include "modelclass.h"
 #include "lightshaderclass.h"
 #include "lightclass.h"
@@ -21,6 +21,8 @@
 #include "particlesystemclass.h"*/
 
 #include "InputManager\InputManager.h"
+#include "Direct3DManager\D3DManager.h"
+#include "FPSManager\FPSManager.h"
 
 #include <Windows.h>
 
@@ -50,8 +52,8 @@ public:
 	bool Render(float);
 
 private:
-	/*D3DClass* m_D3D;
-	CameraClass* m_Camera;
+	/*D3DManager* m_D3D;
+	Camera* m_Camera;
 	ModelClass* m_BoxModel;
 	ModelClass* m_TreeModel;
 	ModelClass* m_FireplaceModel;

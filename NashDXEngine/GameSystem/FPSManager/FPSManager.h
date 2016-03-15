@@ -1,0 +1,49 @@
+////////////////////////////////////////////////////////////////////////////////
+// Filename: FPSManager.h
+////////////////////////////////////////////////////////////////////////////////
+#ifndef _FPSManager_H_
+#define _FPSManager_H_
+
+
+/////////////
+// LINKING //
+/////////////
+#pragma comment(lib, "winmm.lib")
+
+
+//////////////
+// INCLUDES //
+//////////////
+#include <windows.h>
+#include <mmsystem.h>
+#include "..\Manager.h"
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Class name: FPSManager
+////////////////////////////////////////////////////////////////////////////////
+class FPSManager //: public Manager
+{
+public:
+	/*static FPSManager* getInstance()
+	{
+		return instance;
+	}*/
+
+	FPSManager();
+	FPSManager(const FPSManager&);
+	~FPSManager();
+
+	void Initialize();
+	void Shutdown();
+	void Frame();
+	int GetFps();
+
+private:
+	//static FPSManager* instance;
+
+	int m_fps, m_count;
+	unsigned long m_startTime;
+};
+
+#endif
