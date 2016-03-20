@@ -8,17 +8,18 @@
 // Class name: Manager
 ////////////////////////////////////////////////////////////////////////////////
 
+template <class T>
 class Manager
 {
 public:
-	/*static Manager* getInstance()
+	static T* getInstance()
 	{
 		return instance;
-	}*/
+	}
 
-	virtual void Shutdown();
+	virtual void Shutdown() = 0;
 
 protected:
-	//static Manager* instance;
+	static T* instance;
 };
 #endif

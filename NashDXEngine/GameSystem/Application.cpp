@@ -72,6 +72,19 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	//Initialize the FPS singleton
+	new FPSManager();
+	if (!FPSManager::getInstance())
+		return false;
+
+	delete FPSManager::getInstance();
+
+	//Learn and test dynamic casting??
+	//result = dynamic_cast<FPSManager*>(FPSManager::getInstance())->Initialize();
+	result = FPSManager::getInstance()->Initialize();
+	if (!result) {
+		MessageBox(hwnd, L"Could not initialize FPSManager.", L"Error", MB_OK);
+		return false;
+	}
 
 	// Create the position object.
 	/*m_Position = new PositionClass;

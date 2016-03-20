@@ -3,14 +3,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "FPSManager.h"
 
-
+FPSManager* FPSManager::instance;
 
 FPSManager::FPSManager()
 {
-	//if (instance) {
-	//	delete this;
-	//}
-	//else instance = this;
+	if (instance) {
+		delete this;
+	}
+	else instance = this;
 }
 
 
@@ -25,12 +25,12 @@ FPSManager::~FPSManager()
 }
 
 
-void FPSManager::Initialize()
+bool FPSManager::Initialize()
 {
 	m_fps = 0;
 	m_count = 0;
 	m_startTime = timeGetTime();
-	return;
+	return true;
 }
 
 void FPSManager::Shutdown()

@@ -22,19 +22,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: FPSManager
 ////////////////////////////////////////////////////////////////////////////////
-class FPSManager //: public Manager
+class FPSManager : public Manager<FPSManager>
 {
 public:
-	/*static FPSManager* getInstance()
-	{
-		return instance;
-	}*/
+	//static FPSManager* getInstance()
+	//{
+	//	return instance;
+	//}
 
 	FPSManager();
 	FPSManager(const FPSManager&);
 	~FPSManager();
 
-	void Initialize();
+	bool Initialize();
 	void Shutdown();
 	void Frame();
 	int GetFps();
