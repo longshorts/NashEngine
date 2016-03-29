@@ -343,13 +343,13 @@ bool D3DManager::Initialize(int screenWidth, int screenHeight, bool vsync, HWND 
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
 	// Create the projection matrix for 3D rendering.
-	m_projectionMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
+	XMStoreFloat4x4(&m_projectionMatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth));
 
 	// Initialize the world matrix to the identity matrix.
-	m_worldMatrix = XMMatrixIdentity();
+	XMStoreFloat4x4(&m_worldMatrix, XMMatrixIdentity());
 
 	// Create an orthographic projection matrix for 2D rendering.
-	m_orthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+	XMStoreFloat4x4(&m_orthoMatrix, XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth));
 
 	// Clear the second depth stencil state before setting the parameters.
 	ZeroMemory(&depthDisabledStencilDesc, sizeof(depthDisabledStencilDesc));
@@ -566,24 +566,21 @@ ID3D11DeviceContext* D3DManager::GetDeviceContext()
 }
 
 
-void D3DManager::GetProjectionMatrix(XMMATRIX& projectionMatrix)
+XMFLOAT4X4 D3DManager::GetProjectionMatrix()
 {
-	projectionMatrix = m_projectionMatrix;
-	return;
+	return m_projectionMatrix;
 }
 
 
-void D3DManager::GetWorldMatrix(XMMATRIX& worldMatrix)
+XMFLOAT4X4 D3DManager::GetWorldMatrix()
 {
-	worldMatrix = m_worldMatrix;
-	return;
+	return m_worldMatrix;
 }
 
 
-void D3DManager::GetOrthoMatrix(XMMATRIX& orthoMatrix)
+XMFLOAT4X4 D3DManager::GetOrthoMatrix()
 {
-	orthoMatrix = m_orthoMatrix;
-	return;
+	return m_orthoMatrix;
 }
 
 

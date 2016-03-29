@@ -39,7 +39,7 @@ Application::~Application()
 bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
-	//D3DXMATRIX baseViewMatrix;
+	XMFLOAT4X4 baseViewMatrix;
 
 	// Initialize the Direct3D singleton.
 	new D3DManager();
@@ -52,6 +52,17 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+	//Create shaderManager
+	m_ShaderManager = new ShaderManager;
+	if (!m_ShaderManager)
+		return false;
+
+	//Initialize shaderManager
+	result = m_ShaderManager->Initialize(D3DManager::getInstance()->GetDevice(), hwnd);
+	if (!result) {
+		MessageBox(hwnd, L"Could not initialize ShaderManager.", L"Error", MB_OK);
+		return false;
+	}
 
 	// Create the camera object.
 	m_Camera = new Camera;
@@ -76,8 +87,6 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!FPSManager::getInstance())
 		return false;
 
-	delete FPSManager::getInstance();
-
 	//Learn and test dynamic casting??
 	//result = dynamic_cast<FPSManager*>(FPSManager::getInstance())->Initialize();
 	result = FPSManager::getInstance()->Initialize();
@@ -86,8 +95,19 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+	//Initialize scene object
+	m_Scene = new Scene;
+	if (!m_Scene)
+		return false;
+
+	result = m_Scene->Initialize(hwnd, screenWidth, screenHeight, SCREEN_DEPTH);
+	if (!result) {
+		MessageBox(hwnd, L"Could not initialize Scene.", L"Error", MB_OK);
+		return false;
+	}
+
 	// Create the position object.
-	/*m_Position = new PositionClass;
+	/*m_Position = new CameraPosition;
 	if (!m_Position)
 	{
 		return false;
@@ -224,20 +244,32 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetDirection(0.5f, -0.4f, 1.0f);
 	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetSpecularPower(32.0f);
+	m_Light->SetSpecularPower(32.0f);*/
 
-	// Create the text object.
-	m_Text = new TextClass;
+	//Create the text object.
+	/*m_Text = new Text;
 	if (!m_Text)
 	{
 		return false;
 	}
 
 	// Initialize the text object.
-	result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, screenWidth, screenHeight, baseViewMatrix);
+	result = m_Text->Initialize(D3DManager::getInstance()->GetDevice(), D3DManager::getInstance()->GetDeviceContext(), hwnd, screenWidth, screenHeight, baseViewMatrix);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
+		return false;
+	}*/
+
+	//Create User Interface object
+	/*m_UI = new UserInterface;
+	if (!m_UI)
+		return false;
+
+	result = m_UI->Initialize(D3DManager::getInstance(), screenHeight, screenWidth);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the UI object.", L"Error", MB_OK);
 		return false;
 	}*/
 
@@ -248,7 +280,7 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 void Application::Shutdown()
 {
 	// Release the text object.
-	/*if (m_Text)
+	if (m_Text)
 	{
 		m_Text->Shutdown();
 		delete m_Text;
@@ -256,7 +288,7 @@ void Application::Shutdown()
 	}
 
 	// Release the light object.
-	if (m_Light)
+	/*if (m_Light)
 	{
 		delete m_Light;
 		m_Light = 0;
@@ -337,9 +369,24 @@ void Application::Shutdown()
 		m_Camera = 0;
 	}
 
+	if (FPSManager::getInstance()) {
+		FPSManager::getInstance()->Shutdown();
+		delete FPSManager::getInstance();;
+	}
+
+	if (TimerManager::getInstance()) {
+		//TimerManager::getInstance()->Shutdown();
+		delete TimerManager::getInstance();;
+	}
+
 	// Release the D3D object.
-	if (D3DManager::getInstance())
+	if (D3DManager::getInstance()) {
 		D3DManager::getInstance()->Shutdown();
+		delete D3DManager::getInstance();
+	}
+		
+
+
 
 	return;
 }
@@ -352,6 +399,15 @@ bool Application::Frame(int fps, int cpu, float frameTime)
 	int mouseX, mouseY;
 	float rotationY, rotationX;
 	float positionX, positionY, positionZ;
+
+	FPSManager::getInstance()->Frame();
+	TimerManager::getInstance()->Frame();
+
+	//Do Scene processing
+	result = m_Scene->Frame(m_ShaderManager, TimerManager::getInstance()->GetTime(), FPSManager::getInstance()->GetFps());
+	if (!result) {
+		return false;
+	}
 
 	//keyDown = m_InputManager->IsButtonDown(DIK_ESCAPE);
 

@@ -13,8 +13,8 @@
 #include "modelclass.h"
 #include "lightshaderclass.h"
 #include "lightclass.h"
-#include "textclass.h"
-#include "positionclass.h"
+#include "Text.h"
+#include "CameraPosition.h"
 #include "InputManager.h"
 #include "fireshaderclass.h"
 #include "particleshaderclass.h"
@@ -25,6 +25,10 @@
 #include "Direct3DManager\D3DManager.h"
 #include "FPSManager\FPSManager.h"
 #include "TimerManager\TimerManager.h"
+#include "UI\Text\Text.h"
+#include "UI\UserInterface.h"
+#include "Shader\ShaderManager.h"
+#include "Scene\Scene.h"
 
 #include <Windows.h>
 
@@ -62,12 +66,17 @@ private:
 	ModelClass* m_FireModel;
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
-	TextClass* m_Text;
-	PositionClass* m_Position;
+	Text* m_Text;
+	CameraPosition* m_Position;
 	FireShaderClass* m_FireShader;
 	ParticleShaderClass* m_ParticleShader;
 	ParticleSystemClass* m_ParticleSystem;*/
 	Camera* m_Camera;
+	Text* m_Text;
+	UserInterface* m_UI;
+	ShaderManager* m_ShaderManager;
+	Scene* m_Scene;
+
 
 	bool enableParticleSystem;
 	bool enableAdditiveBlending;
