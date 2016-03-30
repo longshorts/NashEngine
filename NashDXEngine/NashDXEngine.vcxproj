@@ -169,7 +169,6 @@
   <ItemGroup>
     <ClInclude Include="GameSystem\Application.h" />
     <ClInclude Include="GameSystem\Camera\Camera.h" />
-    <ClInclude Include="GameSystem\Camera\CameraPosition.h" />
     <ClInclude Include="GameSystem\Direct3DManager\D3DManager.h" />
     <ClInclude Include="GameSystem\FPSManager\FPSManager.h" />
     <ClInclude Include="GameSystem\Manager.h" />
@@ -179,9 +178,11 @@
     <ClInclude Include="GameSystem\Shader\ColorShader\ColorShader.h" />
     <ClInclude Include="GameSystem\Shader\FontShader\FontShader.h" />
     <ClInclude Include="GameSystem\Shader\ShaderManager.h" />
+    <ClInclude Include="GameSystem\Shader\TextureShader\TextureShader.h" />
     <ClInclude Include="GameSystem\System.h" />
     <ClInclude Include="GameSystem\InputManager\InputManager.h" />
     <ClInclude Include="GameSystem\Texture\Texture.h" />
+    <ClInclude Include="GameSystem\Texture\TextureManager.h" />
     <ClInclude Include="GameSystem\TimerManager\TimerManager.h" />
     <ClInclude Include="GameSystem\UI\Font\Font.h" />
     <ClInclude Include="GameSystem\UI\Text\Text.h" />
@@ -190,7 +191,6 @@
   <ItemGroup>
     <ClCompile Include="GameSystem\Application.cpp" />
     <ClCompile Include="GameSystem\Camera\Camera.cpp" />
-    <ClCompile Include="GameSystem\Camera\CameraPosition.cpp" />
     <ClCompile Include="GameSystem\Direct3DManager\D3DManager.cpp" />
     <ClCompile Include="GameSystem\FPSManager\FPSManager.cpp" />
     <ClCompile Include="GameSystem\Scene\Position\Position.cpp" />
@@ -199,13 +199,19 @@
     <ClCompile Include="GameSystem\Shader\ColorShader\ColorShader.cpp" />
     <ClCompile Include="GameSystem\Shader\FontShader\FontShader.cpp" />
     <ClCompile Include="GameSystem\Shader\ShaderManager.cpp" />
+    <ClCompile Include="GameSystem\Shader\TextureShader\TextureShader.cpp" />
     <ClCompile Include="GameSystem\System.cpp" />
     <ClCompile Include="GameSystem\InputManager\InputManager.cpp" />
     <ClCompile Include="GameSystem\Texture\Texture.cpp" />
+    <ClCompile Include="GameSystem\Texture\TextureManager.cpp" />
     <ClCompile Include="GameSystem\TimerManager\TimerManager.cpp" />
     <ClCompile Include="GameSystem\UI\Font\Font.cpp" />
     <ClCompile Include="GameSystem\UI\Text\Text.cpp" />
     <ClCompile Include="GameSystem\UI\UserInterface.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter03_src\source\texture.ps" />
+    <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter03_src\source\texture.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

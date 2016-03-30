@@ -26,6 +26,7 @@ Scene::~Scene()
 bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float screenDepth)
 {
 	bool result;
+	D3DManager* Direct3D = D3DManager::getInstance();
 
 
 	// Create the user interface object.
@@ -36,7 +37,7 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 	}
 
 	// Initialize the user interface object.
-	result = m_UserInterface->Initialize(D3DManager::getInstance(), screenHeight, screenWidth);
+	result = m_UserInterface->Initialize(Direct3D, screenHeight, screenWidth);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the user interface object.", L"Error", MB_OK);
@@ -63,7 +64,7 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 	}
 
 	// Set the initial position and rotation.
-	m_Position->SetPosition(128.0f, 5.0f, -10.0f);
+	m_Position->SetPosition(128.0f, 10.0f, -10.0f);
 	m_Position->SetRotation(0.0f, 0.0f, 0.0f);
 
 	// Create the terrain object.
@@ -74,7 +75,7 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 	}
 
 	// Initialize the terrain object.
-	result = m_Terrain->Initialize(D3DManager::getInstance()->GetDevice());
+	result = m_Terrain->Initialize(Direct3D->GetDevice(), "../Assets/setup.txt");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the terrain object.", L"Error", MB_OK);
@@ -83,6 +84,9 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 
 	// Set the UI to display by default.
 	m_displayUI = true;
+
+	// Set wire frame rendering initially to enabled.
+	m_wireFrame = true;
 
 	return true;
 }
@@ -128,6 +132,7 @@ bool Scene::Frame(ShaderManager* ShaderManager, float frameTime, int fps)
 {
 	bool result;
 	float posX, posY, posZ, rotX, rotY, rotZ;
+
 
 	// Do the frame input processing.
 	HandleMovementInput(InputManager::getInstance(), frameTime);
@@ -202,6 +207,12 @@ void Scene::HandleMovementInput(InputManager* Input, float frameTime)
 		m_displayUI = !m_displayUI;
 	}
 
+	// Determine if the terrain should be rendered in wireframe or not.
+	if (Input->IsButtonDown(DIK_F2))
+	{
+		m_wireFrame = !m_wireFrame;
+	}
+
 	return;
 }
 
@@ -216,22 +227,34 @@ bool Scene::Render(ShaderManager* ShaderManager)
 	m_Camera->Render();
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
-	worldMatrix = XMLoadFloat4x4(&D3DManager::getInstance()->GetWorldMatrix());
+	D3DManager::getInstance()->GetWorldMatrix(worldMatrix);
 	m_Camera->GetViewMatrix(viewMatrix);
-	projectionMatrix = XMLoadFloat4x4(&D3DManager::getInstance()->GetProjectionMatrix());
+	D3DManager::getInstance()->GetProjectionMatrix(projectionMatrix);
 	m_Camera->GetBaseViewMatrix(baseViewMatrix);
-	orthoMatrix = XMLoadFloat4x4(&D3DManager::getInstance()->GetOrthoMatrix());
+	D3DManager::getInstance()->GetOrthoMatrix(orthoMatrix);
 
 	// Clear the buffers to begin the scene.
 	D3DManager::getInstance()->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-	// Render the terrain grid using the color shader.
+	// Turn on wire frame rendering of the terrain if needed.
+	if (m_wireFrame)
+	{
+		D3DManager::getInstance()->EnableWireframe();
+	}
+
+	// Render the terrain grid using the texture shader.
 	m_Terrain->Render(D3DManager::getInstance()->GetDeviceContext());
-	result = ShaderManager->RenderColorShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix,
-		projectionMatrix);
+	result = ShaderManager->RenderTextureShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix,
+		projectionMatrix, TextureManager::getInstance()->GetTexture(1));
 	if (!result)
 	{
 		return false;
+	}
+
+	// Turn off wire frame rendering of the terrain if it was on.
+	if (m_wireFrame)
+	{
+		D3DManager::getInstance()->DisableWireframe();
 	}
 
 	// Render the user interface.

@@ -11,6 +11,7 @@
 #include "../Direct3DManager/D3DManager.h"
 #include "../InputManager/InputManager.h"
 #include "../Shader/ShaderManager.h"
+#include "../Texture/TextureManager.h"
 #include "../TimerManager/TimerManager.h"
 #include "../UI/UserInterface.h"
 #include "../Camera/Camera.h"
@@ -41,7 +42,7 @@ private:
 	Camera* m_Camera;
 	Position* m_Position;
 	Terrain* m_Terrain;
-	bool m_displayUI;
+	bool m_displayUI, m_wireFrame;
 };
 
 #endif

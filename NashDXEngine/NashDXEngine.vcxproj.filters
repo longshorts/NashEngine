@@ -54,9 +54,6 @@
     <ClCompile Include="GameSystem\UI\Text\Text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameSystem\Camera\CameraPosition.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GameSystem\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -70,6 +67,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameSystem\Shader\ShaderManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSystem\Texture\TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSystem\Shader\TextureShader\TextureShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,9 +116,6 @@
     <ClInclude Include="GameSystem\UI\Text\Text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameSystem\Camera\CameraPosition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GameSystem\Scene\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -131,5 +131,15 @@
     <ClInclude Include="GameSystem\Shader\ShaderManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameSystem\Texture\TextureManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSystem\Shader\TextureShader\TextureShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter03_src\source\texture.ps" />
+    <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter03_src\source\texture.vs" />
   </ItemGroup>
 </Project>

@@ -9,8 +9,9 @@
 // MY CLASS INCLUDES //
 ///////////////////////
 #include "../Direct3DManager/D3DManager.h"
-#include "ColorShader\ColorShader.h"
-#include "FontShader\FontShader.h"
+#include "ColorShader/ColorShader.h"
+#include "TextureShader/TextureShader.h"
+#include "FontShader/FontShader.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -27,10 +28,12 @@ public:
 	void Shutdown();
 
 	bool RenderColorShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX);
+	bool RenderTextureShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*);
 	bool RenderFontShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, XMFLOAT4);
 
 private:
 	ColorShader* m_ColorShader;
+	TextureShader* m_TextureShader;
 	FontShader* m_FontShader;
 };
 

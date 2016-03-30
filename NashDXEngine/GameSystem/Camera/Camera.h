@@ -8,7 +8,7 @@
 //////////////
 // INCLUDES //
 //////////////
-#include <DirectXMath.h>
+#include <directxmath.h>
 using namespace DirectX;
 
 
@@ -37,8 +37,7 @@ public:
 private:
 	float m_positionX, m_positionY, m_positionZ;
 	float m_rotationX, m_rotationY, m_rotationZ;
-	XMFLOAT4X4 m_viewMatrix;
-	XMFLOAT4X4 m_baseViewMatrix;
+	XMMATRIX m_viewMatrix, m_baseViewMatrix;
 };
 
 #endif

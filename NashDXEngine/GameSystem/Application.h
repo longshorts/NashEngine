@@ -28,6 +28,7 @@
 #include "UI\Text\Text.h"
 #include "UI\UserInterface.h"
 #include "Shader\ShaderManager.h"
+#include "Texture\TextureManager.h"
 #include "Scene\Scene.h"
 
 #include <Windows.h>

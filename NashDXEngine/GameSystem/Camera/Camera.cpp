@@ -59,6 +59,7 @@ XMFLOAT3 Camera::GetRotation()
 void Camera::Render()
 {
 	XMFLOAT3 up, position, lookAt;
+	XMVECTOR upVector, positionVector, lookAtVector;
 	float yaw, pitch, roll;
 	XMMATRIX rotationMatrix;
 
@@ -68,15 +69,24 @@ void Camera::Render()
 	up.y = 1.0f;
 	up.z = 0.0f;
 
+	// Load it into a XMVECTOR structure.
+	upVector = XMLoadFloat3(&up);
+
 	// Setup the position of the camera in the world.
 	position.x = m_positionX;
 	position.y = m_positionY;
 	position.z = m_positionZ;
 
+	// Load it into a XMVECTOR structure.
+	positionVector = XMLoadFloat3(&position);
+
 	// Setup where the camera is looking by default.
 	lookAt.x = 0.0f;
 	lookAt.y = 0.0f;
 	lookAt.z = 1.0f;
+
+	// Load it into a XMVECTOR structure.
+	lookAtVector = XMLoadFloat3(&lookAt);
 
 	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
 	pitch = m_rotationX * 0.0174532925f;
@@ -87,17 +97,14 @@ void Camera::Render()
 	rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
 	// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
-	XMStoreFloat3(&lookAt, XMVector3TransformCoord(XMLoadFloat3(&lookAt), rotationMatrix));
-	XMStoreFloat3(&up, XMVector3TransformCoord(XMLoadFloat3(&up), rotationMatrix));
+	lookAtVector = XMVector3TransformCoord(lookAtVector, rotationMatrix);
+	upVector = XMVector3TransformCoord(upVector, rotationMatrix);
 
 	// Translate the rotated camera position to the location of the viewer.
-	XMStoreFloat3(&lookAt, XMLoadFloat3(&position) + XMLoadFloat3(&lookAt));
-	//lookAt.x = position.x + lookAt.x;
-	//lookAt.y = position.y + lookAt.y;
-	//lookAt.z = position.z + lookAt.z;
+	lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 
 	// Finally create the view matrix from the three updated vectors.
-	XMStoreFloat4x4(&m_viewMatrix, XMMatrixLookAtLH(XMLoadFloat3(&position), XMLoadFloat3(&lookAt), XMLoadFloat3(&up)));
+	m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
 
 	return;
 }
@@ -105,7 +112,7 @@ void Camera::Render()
 
 void Camera::GetViewMatrix(XMMATRIX& viewMatrix)
 {
-	viewMatrix = XMLoadFloat4x4(&m_viewMatrix);
+	viewMatrix = m_viewMatrix;
 	return;
 }
 
@@ -158,7 +165,7 @@ void Camera::RenderBaseViewMatrix()
 	lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 
 	// Finally create the view matrix from the three updated vectors.
-	XMStoreFloat4x4(&m_baseViewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
+	m_baseViewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
 
 	return;
 }
@@ -166,6 +173,6 @@ void Camera::RenderBaseViewMatrix()
 
 void Camera::GetBaseViewMatrix(XMMATRIX& viewMatrix)
 {
-	viewMatrix = XMLoadFloat4x4(&m_baseViewMatrix);
+	viewMatrix = m_baseViewMatrix;
 	return;
 }
