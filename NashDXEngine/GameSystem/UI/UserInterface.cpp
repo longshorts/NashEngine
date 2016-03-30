@@ -239,7 +239,7 @@ bool UserInterface::Render(D3DManager* Direct3D, ShaderManager* ShaderManager, X
 
 	// Turn off the Z buffer and enable alpha blending to begin 2D rendering.
 	Direct3D->TurnZBufferOff();
-	//Direct3D->EnableAlphaBlending();
+	Direct3D->TurnOnAlphaBlending();
 
 	// Render the fps string.
 	m_FpsString->Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix, m_Font1->GetTexture());
@@ -255,7 +255,7 @@ bool UserInterface::Render(D3DManager* Direct3D, ShaderManager* ShaderManager, X
 	}
 
 	// Turn off alpha blending now that the text has been rendered.
-	//Direct3D->DisableAlphaBlending();
+	Direct3D->TurnOffAlphaBlending();
 
 	// Turn the Z buffer back on now that the 2D rendering has completed.
 	Direct3D->TurnZBufferOn();

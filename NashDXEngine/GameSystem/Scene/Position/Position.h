@@ -48,6 +48,9 @@ private:
 	float m_upwardSpeed, m_downwardSpeed;
 	float m_leftTurnSpeed, m_rightTurnSpeed;
 	float m_lookUpSpeed, m_lookDownSpeed;
+
+	static const float maxSpeed, stepSpeed;
+
 };
 
 #endif

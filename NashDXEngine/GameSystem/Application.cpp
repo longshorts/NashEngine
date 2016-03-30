@@ -19,10 +19,10 @@ Application::Application()
 	m_Position = 0;
 	m_FireShader = 0;
 	m_ParticleShader = 0;
-	m_ParticleSystem = 0;
+	m_ParticleSystem = 0;*/
 
 	enableParticleSystem = false;
-	enableAdditiveBlending = false;*/
+	enableAdditiveBlending = true;
 }
 
 
@@ -50,6 +50,14 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result) {
 		MessageBox(hwnd, L"Could not initialize Direct3D.", L"Error", MB_OK);
 		return false;
+	}
+
+	//Setup Additive Blending
+	if (enableAdditiveBlending) {
+		D3DManager::getInstance()->EnableAdditiveBlending();
+	}
+	else {
+		D3DManager::getInstance()->DisableAdditiveBlending();
 	}
 
 	//Create shaderManager
