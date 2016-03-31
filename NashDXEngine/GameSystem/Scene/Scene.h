@@ -15,6 +15,7 @@
 #include "../TimerManager/TimerManager.h"
 #include "../UI/UserInterface.h"
 #include "../Camera/Camera.h"
+#include "Light/Light.h"
 #include "Position/Position.h"
 #include "Terrain/Terrain.h"
 
@@ -41,6 +42,7 @@ private:
 	UserInterface* m_UserInterface;
 	Camera* m_Camera;
 	Position* m_Position;
+	Light* m_Light;
 	Terrain* m_Terrain;
 	bool m_displayUI, m_wireFrame;
 };

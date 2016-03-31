@@ -8,6 +8,7 @@ Scene::Scene()
 {
 	m_UserInterface = 0;
 	m_Camera = 0;
+	m_Light = 0;
 	m_Position = 0;
 	m_Terrain = 0;
 }
@@ -55,6 +56,17 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 	m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
 	m_Camera->Render();
 	m_Camera->RenderBaseViewMatrix();
+
+	// Create the light object.
+	m_Light = new Light;
+	if (!m_Light)
+	{
+		return false;
+	}
+
+	// Initialize the light object.
+	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_Light->SetDirection(-0.5f, -1.0f, -0.5f);
 
 	// Create the position object.
 	m_Position = new Position;
@@ -107,6 +119,13 @@ void Scene::Shutdown()
 	{
 		delete m_Position;
 		m_Position = 0;
+	}
+
+	// Release the light object.
+	if (m_Light)
+	{
+		delete m_Light;
+		m_Light = 0;
 	}
 
 	// Release the camera object.
@@ -242,10 +261,11 @@ bool Scene::Render(ShaderManager* ShaderManager)
 		D3DManager::getInstance()->EnableWireframe();
 	}
 
-	// Render the terrain grid using the texture shader.
+	// Render the terrain grid using the light shader.
 	m_Terrain->Render(D3DManager::getInstance()->GetDeviceContext());
-	result = ShaderManager->RenderTextureShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix,
-		projectionMatrix, TextureManager::getInstance()->GetTexture(1));
+	result = ShaderManager->RenderLightShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix,
+		projectionMatrix, TextureManager::getInstance()->GetTexture(1), m_Light->GetDirection(),
+		m_Light->GetDiffuseColor());
 	if (!result)
 	{
 		return false;
