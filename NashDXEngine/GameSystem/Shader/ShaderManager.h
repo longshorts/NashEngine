@@ -13,6 +13,7 @@
 #include "TextureShader/TextureShader.h"
 #include "LightShader/LightShader.h"
 #include "FontShader/FontShader.h"
+#include "SkyDomeShader/SkyDomeShader.h"
 #include "TerrainShader/TerrainShader.h"
 
 
@@ -33,6 +34,7 @@ public:
 	bool RenderTextureShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*);
 	bool RenderLightShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT4);
 	bool RenderFontShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, XMFLOAT4);
+	bool RenderSkyDomeShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, XMFLOAT4, XMFLOAT4);
 	bool RenderTerrainShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, ID3D11ShaderResourceView*,
 		XMFLOAT3, XMFLOAT4);
 
@@ -41,6 +43,7 @@ private:
 	TextureShader* m_TextureShader;
 	LightShader* m_LightShader;
 	FontShader* m_FontShader;
+	SkyDomeShader* m_SkyDomeShader;
 	TerrainShader* m_TerrainShader;
 };
 

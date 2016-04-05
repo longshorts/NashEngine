@@ -173,6 +173,7 @@
     <ClInclude Include="GameSystem\FPSManager\FPSManager.h" />
     <ClInclude Include="GameSystem\Manager.h" />
     <ClInclude Include="GameSystem\Scene\Light\Light.h" />
+    <ClInclude Include="GameSystem\Scene\Model\SkyDome.h" />
     <ClInclude Include="GameSystem\Scene\Position\Position.h" />
     <ClInclude Include="GameSystem\Scene\Scene.h" />
     <ClInclude Include="GameSystem\Scene\Terrain\Terrain.h" />
@@ -180,6 +181,7 @@
     <ClInclude Include="GameSystem\Shader\FontShader\FontShader.h" />
     <ClInclude Include="GameSystem\Shader\LightShader\LightShader.h" />
     <ClInclude Include="GameSystem\Shader\ShaderManager.h" />
+    <ClInclude Include="GameSystem\Shader\SkyDomeShader\SkyDomeShader.h" />
     <ClInclude Include="GameSystem\Shader\TerrainShader\TerrainShader.h" />
     <ClInclude Include="GameSystem\Shader\TextureShader\TextureShader.h" />
     <ClInclude Include="GameSystem\System.h" />
@@ -197,6 +199,7 @@
     <ClCompile Include="GameSystem\Direct3DManager\D3DManager.cpp" />
     <ClCompile Include="GameSystem\FPSManager\FPSManager.cpp" />
     <ClCompile Include="GameSystem\Scene\Light\Light.cpp" />
+    <ClCompile Include="GameSystem\Scene\Model\SkyDome.cpp" />
     <ClCompile Include="GameSystem\Scene\Position\Position.cpp" />
     <ClCompile Include="GameSystem\Scene\Scene.cpp" />
     <ClCompile Include="GameSystem\Scene\Terrain\Terrain.cpp" />
@@ -204,6 +207,7 @@
     <ClCompile Include="GameSystem\Shader\FontShader\FontShader.cpp" />
     <ClCompile Include="GameSystem\Shader\LightShader\LightShader.cpp" />
     <ClCompile Include="GameSystem\Shader\ShaderManager.cpp" />
+    <ClCompile Include="GameSystem\Shader\SkyDomeShader\SkyDomeShader.cpp" />
     <ClCompile Include="GameSystem\Shader\TerrainShader\TerrainShader.cpp" />
     <ClCompile Include="GameSystem\Shader\TextureShader\TextureShader.cpp" />
     <ClCompile Include="GameSystem\System.cpp" />
