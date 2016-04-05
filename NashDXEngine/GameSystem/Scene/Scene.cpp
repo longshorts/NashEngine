@@ -236,6 +236,10 @@ void Scene::HandleMovementInput(InputManager* Input, float frameTime)
 	keyDown = Input->IsButtonDown(DIK_PGDN);
 	m_Position->LookDownward(keyDown);
 
+	//Check mouse input
+	m_Position->MouseTurn(Input->GetMouseDeltaX());
+	m_Position->MousePitch(Input->GetMouseDeltaY());
+
 	// Get the view point position/rotation.
 	m_Position->GetPosition(posX, posY, posZ);
 	m_Position->GetRotation(rotX, rotY, rotZ);
@@ -245,13 +249,13 @@ void Scene::HandleMovementInput(InputManager* Input, float frameTime)
 	m_Camera->SetRotation(rotX, rotY, rotZ);
 
 	// Determine if the user interface should be displayed or not.
-	if (Input->IsButtonDown(DIK_F1))
+	if (Input->IsButtonPressed(DIK_F1))
 	{
 		m_displayUI = !m_displayUI;
 	}
 
 	// Determine if the terrain should be rendered in wireframe or not.
-	if (Input->IsButtonDown(DIK_F2))
+	if (Input->IsButtonPressed(DIK_F2))
 	{
 		m_wireFrame = !m_wireFrame;
 	}

@@ -349,3 +349,25 @@ void Position::LookDownward(bool keydown)
 
 	return;
 }
+
+void Position::MouseTurn(int mouseDeltaY) 
+{
+	m_rotationY += mouseDeltaY;
+
+	// Keep the rotation in the 0 to 360 range.
+	if (m_rotationY > 360.0f)
+	{
+		m_rotationY -= 360.0f;
+	}
+}
+
+void Position::MousePitch(int mouseDeltaY)
+{
+	m_rotationX += mouseDeltaY;
+
+	// Keep the rotation in the 0 to 360 range.
+	if (m_rotationX > 360.0f)
+	{
+		m_rotationX -= 360.0f;
+	}
+}

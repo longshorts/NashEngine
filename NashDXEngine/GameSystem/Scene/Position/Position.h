@@ -38,6 +38,10 @@ public:
 	void LookUpward(bool);
 	void LookDownward(bool);
 
+	void MouseTurn(int);
+	void MousePitch(int);
+
+
 private:
 	float m_positionX, m_positionY, m_positionZ;
 	float m_rotationX, m_rotationY, m_rotationZ;

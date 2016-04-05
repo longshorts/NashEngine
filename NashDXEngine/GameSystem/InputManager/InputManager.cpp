@@ -169,6 +169,15 @@ bool InputManager::ReadKeyboard()
 {
 	HRESULT result;
 
+	//Copy current keyboard state to previous array
+	for (int i = 0; i < 256; i++)
+	{
+		m_prevKeyboardState[i] = m_keyboardState[i];
+	}
+	/*if (m_keyboardState)
+	{
+		auto m_prevKeyboardState = m_keyboardState;
+	}*/
 
 	// Read the keyboard device.
 	result = m_keyboard->GetDeviceState(sizeof(m_keyboardState), (LPVOID)&m_keyboardState);
@@ -238,10 +247,30 @@ void InputManager::GetMouseLocation(int& mouseX, int& mouseY)
 }
 
 bool InputManager::IsButtonDown(unsigned int btn) {
+	//Return true if the button is shown to be down
 	if (m_keyboardState[btn] & 0x80)
 	{
 		return true;
 	}
 
 	return false;
+}
+
+bool InputManager::IsButtonPressed(unsigned int btn) {
+	//Return true if the current keyboard state shows the button pressed and the older doesn't.
+	if (m_keyboardState[btn] & 0x80 && !(m_prevKeyboardState[btn] & 0x80))
+	{
+		return true;
+	}
+	return false;
+}
+
+int InputManager::GetMouseDeltaX()
+{
+	return (int)(m_mouseState.lX * mouseSensitivity);
+}
+
+int InputManager::GetMouseDeltaY()
+{
+	return (int)(m_mouseState.lY * mouseSensitivity);
 }
