@@ -180,6 +180,7 @@
     <ClInclude Include="GameSystem\Shader\FontShader\FontShader.h" />
     <ClInclude Include="GameSystem\Shader\LightShader\LightShader.h" />
     <ClInclude Include="GameSystem\Shader\ShaderManager.h" />
+    <ClInclude Include="GameSystem\Shader\TerrainShader\TerrainShader.h" />
     <ClInclude Include="GameSystem\Shader\TextureShader\TextureShader.h" />
     <ClInclude Include="GameSystem\System.h" />
     <ClInclude Include="GameSystem\InputManager\InputManager.h" />
@@ -203,6 +204,7 @@
     <ClCompile Include="GameSystem\Shader\FontShader\FontShader.cpp" />
     <ClCompile Include="GameSystem\Shader\LightShader\LightShader.cpp" />
     <ClCompile Include="GameSystem\Shader\ShaderManager.cpp" />
+    <ClCompile Include="GameSystem\Shader\TerrainShader\TerrainShader.cpp" />
     <ClCompile Include="GameSystem\Shader\TextureShader\TextureShader.cpp" />
     <ClCompile Include="GameSystem\System.cpp" />
     <ClCompile Include="GameSystem\InputManager\InputManager.cpp" />
@@ -216,6 +218,8 @@
   <ItemGroup>
     <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter03_src\source\texture.ps" />
     <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter03_src\source\texture.vs" />
+    <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter06_src\source\terrain.ps" />
+    <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter06_src\source\terrain.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

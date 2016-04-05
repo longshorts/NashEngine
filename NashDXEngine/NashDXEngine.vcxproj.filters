@@ -81,6 +81,9 @@
     <ClCompile Include="GameSystem\Scene\Light\Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameSystem\Shader\TerrainShader\TerrainShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameSystem\System.h">
@@ -149,9 +152,14 @@
     <ClInclude Include="GameSystem\Scene\Light\Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameSystem\Shader\TerrainShader\TerrainShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter03_src\source\texture.ps" />
     <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter03_src\source\texture.vs" />
+    <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter06_src\source\terrain.ps" />
+    <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter06_src\source\terrain.vs" />
   </ItemGroup>
 </Project>

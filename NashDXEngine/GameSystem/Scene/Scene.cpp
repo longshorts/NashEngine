@@ -253,7 +253,7 @@ bool Scene::Render(ShaderManager* ShaderManager)
 	D3DManager::getInstance()->GetOrthoMatrix(orthoMatrix);
 
 	// Clear the buffers to begin the scene.
-	D3DManager::getInstance()->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+	D3DManager::getInstance()->BeginScene(0.0f, 0.0f, 0.1f, 1.0f);
 
 	// Turn on wire frame rendering of the terrain if needed.
 	if (m_wireFrame)
@@ -261,11 +261,11 @@ bool Scene::Render(ShaderManager* ShaderManager)
 		D3DManager::getInstance()->EnableWireframe();
 	}
 
-	// Render the terrain grid using the light shader.
+	// Render the terrain grid using the terrain shader.
 	m_Terrain->Render(D3DManager::getInstance()->GetDeviceContext());
-	result = ShaderManager->RenderLightShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix,
-		projectionMatrix, TextureManager::getInstance()->GetTexture(1), m_Light->GetDirection(),
-		m_Light->GetDiffuseColor());
+	result = ShaderManager->RenderTerrainShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix,
+		projectionMatrix, TextureManager::getInstance()->GetTexture(1), TextureManager::getInstance()->GetTexture(1),
+		m_Light->GetDirection(), m_Light->GetDiffuseColor());
 	if (!result)
 	{
 		return false;
