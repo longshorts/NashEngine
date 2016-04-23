@@ -344,8 +344,8 @@ bool FontShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRI
 	XMMATRIX transposedProjectionMatrix;
 
 	transposedWorldMatrix = XMMatrixTranspose(worldMatrix);
-	transposedWorldMatrix = XMMatrixTranspose(viewMatrix);
-	transposedWorldMatrix = XMMatrixTranspose(projectionMatrix);
+	transposedViewMatrix = XMMatrixTranspose(viewMatrix);
+	transposedProjectionMatrix = XMMatrixTranspose(projectionMatrix);
 
 	// Copy the matrices into the constant buffer.
 	XMStoreFloat4x4(&(dataPtr->world), transposedWorldMatrix);
