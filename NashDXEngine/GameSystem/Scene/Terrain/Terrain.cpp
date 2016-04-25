@@ -109,20 +109,14 @@ void Terrain::Shutdown()
 	return;
 }
 
-
-/*bool Terrain::Render(ID3D11DeviceContext* deviceContext)
+void Terrain::Frame()
 {
-	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	RenderBuffers(deviceContext);
-
-	return true;
+	m_renderCount = 0;
+	m_cellsDrawn = 0;
+	m_cellsCulled = 0;
+	return;
 }
 
-
-int Terrain::GetIndexCount()
-{
-	return m_indexCount;
-}*/
 
 
 bool Terrain::LoadSetupFile(char* filename)
@@ -1150,9 +1144,34 @@ void Terrain::ShutdownTerrainCells()
 	return;
 }
 
-bool Terrain::RenderCell(ID3D11DeviceContext* deviceContext, int cellId)
+bool Terrain::RenderCell(ID3D11DeviceContext* deviceContext, int cellId, Frustum* Frustum)
 {
+	float maxWidth, maxHeight, maxDepth, minWidth, minHeight, minDepth;
+	bool result;
+
+
+	// Get the dimensions of the terrain cell.
+	m_TerrainCells[cellId].GetCellDimensions(maxWidth, maxHeight, maxDepth, minWidth, minHeight, minDepth);
+
+	// Check if the cell is visible.  If it is not visible then just return and don't render it.
+	result = Frustum->CheckRectangle2(maxWidth, maxHeight, maxDepth, minWidth, minHeight, minDepth);
+	if (!result)
+	{
+		// Increment the number of cells that were culled.
+		m_cellsCulled++;
+
+		return false;
+	}
+
+	// If it is visible then render it.
 	m_TerrainCells[cellId].Render(deviceContext);
+
+	// Add the polygons in the cell to the render count.
+	m_renderCount += (m_TerrainCells[cellId].GetVertexCount() / 3);
+
+	// Increment the number of cells that were actually drawn.
+	m_cellsDrawn++;
+
 	return true;
 }
 
@@ -1181,138 +1200,20 @@ int Terrain::GetCellCount()
 	return m_cellCount;
 }
 
-/*bool Terrain::InitializeBuffers(ID3D11Device* device)
+int Terrain::GetRenderCount()
 {
-	VertexType* vertices;
-	unsigned long* indices;
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData;
-	HRESULT result;
-	int i;
-
-
-
-	// Calculate the number of vertices in the terrain.
-	m_vertexCount = (m_terrainWidth - 1) * (m_terrainHeight - 1) * 6;
-
-	// Set the index count to the same as the vertex count.
-	m_indexCount = m_vertexCount;
-
-	// Create the vertex array.
-	vertices = new VertexType[m_vertexCount];
-	if (!vertices)
-	{
-		return false;
-	}
-
-	// Create the index array.
-	indices = new unsigned long[m_indexCount];
-	if (!indices)
-	{
-		return false;
-	}
-
-	// Load the vertex array and index array with 3D terrain model data.
-	for (i = 0; i<m_vertexCount; i++)
-	{
-		vertices[i].position = XMFLOAT3(m_terrainModel[i].x, m_terrainModel[i].y, m_terrainModel[i].z);
-		vertices[i].texture = XMFLOAT2(m_terrainModel[i].tu, m_terrainModel[i].tv);
-		vertices[i].normal = XMFLOAT3(m_terrainModel[i].nx, m_terrainModel[i].ny, m_terrainModel[i].nz);
-		vertices[i].tangent = XMFLOAT3(m_terrainModel[i].tx, m_terrainModel[i].ty, m_terrainModel[i].tz);
-		vertices[i].binormal = XMFLOAT3(m_terrainModel[i].bx, m_terrainModel[i].by, m_terrainModel[i].bz);
-		vertices[i].color = XMFLOAT3(m_terrainModel[i].r, m_terrainModel[i].g, m_terrainModel[i].b);
-		indices[i] = i;
-	}
-
-	// Set up the description of the static vertex buffer.
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
-	vertexBufferDesc.StructureByteStride = 0;
-
-	// Give the subresource structure a pointer to the vertex data.
-	vertexData.pSysMem = vertices;
-	vertexData.SysMemPitch = 0;
-	vertexData.SysMemSlicePitch = 0;
-
-	// Now create the vertex buffer.
-	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	// Set up the description of the static index buffer.
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.CPUAccessFlags = 0;
-	indexBufferDesc.MiscFlags = 0;
-	indexBufferDesc.StructureByteStride = 0;
-
-	// Give the subresource structure a pointer to the index data.
-	indexData.pSysMem = indices;
-	indexData.SysMemPitch = 0;
-	indexData.SysMemSlicePitch = 0;
-
-	// Create the index buffer.
-	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	// Release the arrays now that the buffers have been created and loaded.
-	delete[] vertices;
-	vertices = 0;
-
-	delete[] indices;
-	indices = 0;
-
-	return true;
+	return m_renderCount;
 }
 
 
-void Terrain::ShutdownBuffers()
+int Terrain::GetCellsDrawn()
 {
-	// Release the index buffer.
-	if (m_indexBuffer)
-	{
-		m_indexBuffer->Release();
-		m_indexBuffer = 0;
-	}
-
-	// Release the vertex buffer.
-	if (m_vertexBuffer)
-	{
-		m_vertexBuffer->Release();
-		m_vertexBuffer = 0;
-	}
-
-	return;
+	return m_cellsDrawn;
 }
 
 
-void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
+int Terrain::GetCellsCulled()
 {
-	unsigned int stride;
-	unsigned int offset;
+	return m_cellsCulled;
+}
 
-
-	// Set vertex buffer stride and offset.
-	stride = sizeof(VertexType);
-	offset = 0;
-
-	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
-
-	// Set the index buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	return;
-}*/

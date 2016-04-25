@@ -17,6 +17,7 @@
 #include "../Camera/Camera.h"
 #include "Light/Light.h"
 #include "Position/Position.h"
+#include "Terrain/Frustum/Frustum.h"
 #include "Model/SkyDome.h"
 #include "Terrain/Terrain.h"
 
@@ -43,6 +44,7 @@ private:
 	UserInterface* m_UserInterface;
 	Camera* m_Camera;
 	Position* m_Position;
+	Frustum* m_Frustum;
 	SkyDome* m_SkyDome;
 	Light* m_Light;
 	Terrain* m_Terrain;

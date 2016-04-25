@@ -10,6 +10,7 @@ Scene::Scene()
 	m_Camera = 0;
 	m_Light = 0;
 	m_Position = 0;
+	m_Frustum = 0;
 	m_SkyDome = 0;
 	m_Terrain = 0;
 }
@@ -83,6 +84,16 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 	m_Position->SetPosition(128.0f, 10.0f, -10.0f);
 	m_Position->SetRotation(0.0f, 0.0f, 0.0f);
 
+	// Create the frustum object.
+	m_Frustum = new Frustum;
+	if (!m_Frustum)
+	{
+		return false;
+	}
+
+	// Initialize the frustum object.
+	m_Frustum->Initialize(screenDepth);
+
 	// Create the sky dome object.
 	m_SkyDome = new SkyDome;
 	if (!m_SkyDome)
@@ -144,6 +155,13 @@ void Scene::Shutdown()
 		m_SkyDome = 0;
 	}
 
+	// Release the frustum object.
+	if (m_Frustum)
+	{
+		delete m_Frustum;
+		m_Frustum = 0;
+	}
+
 	// Release the position object.
 	if (m_Position)
 	{
@@ -196,6 +214,9 @@ bool Scene::Frame(ShaderManager* ShaderManager, float frameTime, int fps)
 	{
 		return false;
 	}
+
+	// Do the terrain frame processing.
+	m_Terrain->Frame();
 
 	// Render the graphics.
 	result = Render(ShaderManager);
@@ -297,6 +318,9 @@ bool Scene::Render(ShaderManager* ShaderManager)
 	// Get the position of the camera.
 	cameraPosition = m_Camera->GetPosition();
 
+	// Construct the frustum.
+	m_Frustum->ConstructFrustum(projectionMatrix, viewMatrix);
+
 	// Clear the buffers to begin the scene.
 	D3DManager::getInstance()->BeginScene(0.0f, 0.0f, 0.1f, 1.0f);
 
@@ -332,31 +356,29 @@ bool Scene::Render(ShaderManager* ShaderManager)
 	// Render the terrain cells (and cell lines if needed).
 	for (i = 0; i<m_Terrain->GetCellCount(); i++)
 	{
-		// Put the terrain cell buffers on the pipeline.
-		result = m_Terrain->RenderCell(D3DManager::getInstance()->GetDeviceContext(), i);
-		if (!result)
+		// Render each terrain cell if it is visible only.
+		result = m_Terrain->RenderCell(D3DManager::getInstance()->GetDeviceContext(), i, m_Frustum);
+		if (result)
 		{
-			return false;
-
-		}
-
-		// Render the cell buffers using the terrain shader.
-		result = ShaderManager->RenderTerrainShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetCellIndexCount(i), worldMatrix, viewMatrix,
-			projectionMatrix, TextureManager::getInstance()->GetTexture(0), TextureManager::getInstance()->GetTexture(1),
-			m_Light->GetDirection(), m_Light->GetDiffuseColor(), sandColor, grassColor);
-		if (!result)
-		{
-			return false;
-		}
-
-		// If needed then render the bounding box around this terrain cell using the color shader. 
-		if (m_cellLines)
-		{
-			m_Terrain->RenderCellLines(D3DManager::getInstance()->GetDeviceContext(), i);
-			ShaderManager->RenderColorShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetCellLinesIndexCount(i), worldMatrix, viewMatrix, projectionMatrix);
+			// Render the cell buffers using the terrain shader.
+			result = ShaderManager->RenderTerrainShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetCellIndexCount(i), worldMatrix, viewMatrix,
+				projectionMatrix, TextureManager::getInstance()->GetTexture(0), TextureManager::getInstance()->GetTexture(1),
+				m_Light->GetDirection(), m_Light->GetDiffuseColor(), sandColor, grassColor);
 			if (!result)
 			{
 				return false;
+			}
+
+			// If needed then render the bounding box around this terrain cell using the color shader. 
+			if (m_cellLines)
+			{
+				m_Terrain->RenderCellLines(D3DManager::getInstance()->GetDeviceContext(), i);
+				ShaderManager->RenderColorShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetCellLinesIndexCount(i), worldMatrix,
+					viewMatrix, projectionMatrix);
+				if (!result)
+				{
+					return false;
+				}
 			}
 		}
 	}
@@ -365,6 +387,14 @@ bool Scene::Render(ShaderManager* ShaderManager)
 	if (m_wireFrame)
 	{
 		D3DManager::getInstance()->DisableWireframe();
+	}
+
+	// Update the render counts in the UI.
+	result = m_UserInterface->UpdateRenderCounts(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetRenderCount(), m_Terrain->GetCellsDrawn(),
+		m_Terrain->GetCellsCulled());
+	if (!result)
+	{
+		return false;
 	}
 
 	// Render the user interface.

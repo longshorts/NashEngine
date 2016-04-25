@@ -20,6 +20,7 @@ using namespace std;
 ///////////////////////
 #include "TerrainCell.h"
 #include "../../Noise/SimplexNoise.h"
+#include "Frustum\Frustum.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,13 +75,18 @@ public:
 
 	bool Initialize(ID3D11Device*, char*);
 	void Shutdown();
+
+	void Frame();
 	
-	bool RenderCell(ID3D11DeviceContext*, int);
+	bool RenderCell(ID3D11DeviceContext*, int, Frustum*);
 	void RenderCellLines(ID3D11DeviceContext*, int);
 
 	int GetCellIndexCount(int);
 	int GetCellLinesIndexCount(int);
 	int GetCellCount();
+	int GetRenderCount();
+	int GetCellsDrawn();
+	int GetCellsCulled();
 
 private:
 	bool LoadSetupFile(char*);
@@ -114,7 +120,7 @@ private:
 	ModelType* m_terrainModel;
 
 	TerrainCell* m_TerrainCells;
-	int m_cellCount;
+	int m_cellCount, m_renderCount, m_cellsDrawn, m_cellsCulled;
 };
 
 #endif
