@@ -12,6 +12,7 @@ Terrain::Terrain()
 	m_colorMapFilename = 0;
 	m_heightMap = 0;
 	m_terrainModel = 0;
+	m_TerrainCells = 0;
 }
 
 
@@ -80,8 +81,8 @@ bool Terrain::Initialize(ID3D11Device* device, char* setupFilename)
 	// Calculate the tangent and binormal for the terrain model.
 	CalculateTerrainVectors();
 
-	// Load the rendering buffers with the terrain data.
-	result = InitializeBuffers(device);
+	// Create and load the cells with the terrain data.
+	result = LoadTerrainCells(device);
 	if (!result)
 	{
 		return false;
@@ -96,8 +97,8 @@ bool Terrain::Initialize(ID3D11Device* device, char* setupFilename)
 
 void Terrain::Shutdown()
 {
-	// Release the rendering buffers.
-	ShutdownBuffers();
+	// Release the terrain cells.
+	ShutdownTerrainCells();
 
 	// Release the terrain model.
 	ShutdownTerrainModel();
@@ -109,7 +110,7 @@ void Terrain::Shutdown()
 }
 
 
-bool Terrain::Render(ID3D11DeviceContext* deviceContext)
+/*bool Terrain::Render(ID3D11DeviceContext* deviceContext)
 {
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
@@ -121,7 +122,7 @@ bool Terrain::Render(ID3D11DeviceContext* deviceContext)
 int Terrain::GetIndexCount()
 {
 	return m_indexCount;
-}
+}*/
 
 
 bool Terrain::LoadSetupFile(char* filename)
@@ -1090,8 +1091,97 @@ void Terrain::CalculateTangentBinormal(TempVertexType vertex1, TempVertexType ve
 	return;
 }
 
+bool Terrain::LoadTerrainCells(ID3D11Device* device)
+{
+	int cellHeight, cellWidth, cellRowCount, i, j, index;
+	bool result;
 
-bool Terrain::InitializeBuffers(ID3D11Device* device)
+
+	// Set the height and width of each terrain cell to a fixed 33x33 vertex array.
+	cellHeight = 33;
+	cellWidth = 33;
+
+	// Calculate the number of cells needed to store the terrain data.
+	cellRowCount = (m_terrainWidth - 1) / (cellWidth - 1);
+	m_cellCount = cellRowCount * cellRowCount;
+
+	// Create the terrain cell array.
+	m_TerrainCells = new TerrainCell[m_cellCount];
+	if (!m_TerrainCells)
+	{
+		return false;
+	}
+
+	// Loop through and initialize all the terrain cells.
+	for (j = 0; j<cellRowCount; j++)
+	{
+		for (i = 0; i<cellRowCount; i++)
+		{
+			index = (cellRowCount * j) + i;
+
+			result = m_TerrainCells[index].Initialize(device, m_terrainModel, i, j, cellHeight, cellWidth, m_terrainWidth);
+			if (!result)
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+void Terrain::ShutdownTerrainCells()
+{
+	int i;
+
+
+	// Release the terrain cell array.
+	if (m_TerrainCells)
+	{
+		for (i = 0; i<m_cellCount; i++)
+		{
+			m_TerrainCells[i].Shutdown();
+		}
+
+		delete[] m_TerrainCells;
+		m_TerrainCells = 0;
+	}
+
+	return;
+}
+
+bool Terrain::RenderCell(ID3D11DeviceContext* deviceContext, int cellId)
+{
+	m_TerrainCells[cellId].Render(deviceContext);
+	return true;
+}
+
+
+void Terrain::RenderCellLines(ID3D11DeviceContext* deviceContext, int cellId)
+{
+	m_TerrainCells[cellId].RenderLineBuffers(deviceContext);
+	return;
+}
+
+
+int Terrain::GetCellIndexCount(int cellId)
+{
+	return m_TerrainCells[cellId].GetIndexCount();
+}
+
+
+int Terrain::GetCellLinesIndexCount(int cellId)
+{
+	return m_TerrainCells[cellId].GetLineBuffersIndexCount();
+}
+
+
+int Terrain::GetCellCount()
+{
+	return m_cellCount;
+}
+
+/*bool Terrain::InitializeBuffers(ID3D11Device* device)
 {
 	VertexType* vertices;
 	unsigned long* indices;
@@ -1225,4 +1315,4 @@ void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return;
-}
+}*/

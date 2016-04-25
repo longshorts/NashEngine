@@ -15,6 +15,10 @@
 using namespace DirectX;
 using namespace std;
 
+///////////////////////
+// MY CLASS INCLUDES //
+///////////////////////
+#include "TerrainCell.h"
 #include "../../Noise/SimplexNoise.h"
 
 
@@ -70,9 +74,13 @@ public:
 
 	bool Initialize(ID3D11Device*, char*);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*);
+	
+	bool RenderCell(ID3D11DeviceContext*, int);
+	void RenderCellLines(ID3D11DeviceContext*, int);
 
-	int GetIndexCount();
+	int GetCellIndexCount(int);
+	int GetCellLinesIndexCount(int);
+	int GetCellCount();
 
 private:
 	bool LoadSetupFile(char*);
@@ -89,6 +97,9 @@ private:
 	void CalculateTerrainVectors();
 	void CalculateTangentBinormal(TempVertexType, TempVertexType, TempVertexType, VectorType&, VectorType&);
 
+	bool LoadTerrainCells(ID3D11Device*);
+	void ShutdownTerrainCells();
+
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
@@ -101,6 +112,9 @@ private:
 	char *m_terrainFilename, *m_colorMapFilename, *m_heightBlendMapFilename;
 	HeightMapType* m_heightMap;
 	ModelType* m_terrainModel;
+
+	TerrainCell* m_TerrainCells;
+	int m_cellCount;
 };
 
 #endif

@@ -35,6 +35,7 @@ struct PixelInputType
 	float3 tangent : TANGENT;
 	float3 binormal : BINORMAL;
 	float4 color : COLOR;
+	float4 terrainPosition : TERPOS0;
 };
 
 
@@ -71,6 +72,9 @@ PixelInputType TerrainVertexShader(VertexInputType input)
 
 	// Store the input color for the pixel shader to use.
     output.color = float4(input.color, 1.0f);
+
+	//Send the unmodified position through to the pixel shader
+	output.terrainPosition = input.position;
 
     return output;
 }

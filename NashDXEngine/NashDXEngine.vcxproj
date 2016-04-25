@@ -178,6 +178,7 @@
     <ClInclude Include="GameSystem\Scene\Position\Position.h" />
     <ClInclude Include="GameSystem\Scene\Scene.h" />
     <ClInclude Include="GameSystem\Scene\Terrain\Terrain.h" />
+    <ClInclude Include="GameSystem\Scene\Terrain\TerrainCell.h" />
     <ClInclude Include="GameSystem\Shader\ColorShader\ColorShader.h" />
     <ClInclude Include="GameSystem\Shader\FontShader\FontShader.h" />
     <ClInclude Include="GameSystem\Shader\LightShader\LightShader.h" />
@@ -205,6 +206,7 @@
     <ClCompile Include="GameSystem\Scene\Position\Position.cpp" />
     <ClCompile Include="GameSystem\Scene\Scene.cpp" />
     <ClCompile Include="GameSystem\Scene\Terrain\Terrain.cpp" />
+    <ClCompile Include="GameSystem\Scene\Terrain\TerrainCell.cpp" />
     <ClCompile Include="GameSystem\Shader\ColorShader\ColorShader.cpp" />
     <ClCompile Include="GameSystem\Shader\FontShader\FontShader.cpp" />
     <ClCompile Include="GameSystem\Shader\LightShader\LightShader.cpp" />

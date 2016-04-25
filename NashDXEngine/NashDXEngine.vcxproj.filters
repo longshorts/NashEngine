@@ -93,6 +93,9 @@
     <ClCompile Include="GameSystem\Noise\SimplexNoise.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameSystem\Scene\Terrain\TerrainCell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameSystem\System.h">
@@ -171,6 +174,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameSystem\Noise\SimplexNoise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSystem\Scene\Terrain\TerrainCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

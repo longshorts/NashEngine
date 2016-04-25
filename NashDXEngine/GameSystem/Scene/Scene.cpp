@@ -30,6 +30,9 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 	bool result;
 	D3DManager* Direct3D = D3DManager::getInstance();
 
+	//sandColor = XMFLOAT4((float)(235 / 255), (float)(185 / 255), (float)(136 / 255), 1);
+	sandColor = XMFLOAT4(235.0f / 255.0f, 185.0f / 255.0f, 136.0f / 255.0f, 1);
+	grassColor = XMFLOAT4(58.0f / 255.0f, 124.0f / 255.0f, 37.0f / 255.0f, 1);
 
 	// Create the user interface object.
 	m_UserInterface = new UserInterface;
@@ -115,6 +118,9 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 
 	// Set wire frame rendering initially to enabled.
 	m_wireFrame = true;
+
+	// Set the rendering of cell lines initially to enabled.
+	m_cellLines = true;
 
 	return true;
 }
@@ -260,6 +266,12 @@ void Scene::HandleMovementInput(InputManager* Input, float frameTime)
 		m_wireFrame = !m_wireFrame;
 	}
 
+	// Determine if the cell terrain frame should be rendered or not
+	if (Input->IsButtonPressed(DIK_F3))
+	{
+		m_cellLines = !m_cellLines;
+	}
+
 	return;
 }
 
@@ -269,6 +281,7 @@ bool Scene::Render(ShaderManager* ShaderManager)
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix;
 	bool result;
 	XMFLOAT3 cameraPosition;
+	int i;
 
 
 	// Generate the view matrix based on the camera's position.
@@ -316,14 +329,36 @@ bool Scene::Render(ShaderManager* ShaderManager)
 		D3DManager::getInstance()->EnableWireframe();
 	}
 
-	// Render the terrain grid using the terrain shader.
-	m_Terrain->Render(D3DManager::getInstance()->GetDeviceContext());
-	result = ShaderManager->RenderTerrainShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix,
-		projectionMatrix, TextureManager::getInstance()->GetTexture(1), TextureManager::getInstance()->GetTexture(1),
-		m_Light->GetDirection(), m_Light->GetDiffuseColor());
-	if (!result)
+	// Render the terrain cells (and cell lines if needed).
+	for (i = 0; i<m_Terrain->GetCellCount(); i++)
 	{
-		return false;
+		// Put the terrain cell buffers on the pipeline.
+		result = m_Terrain->RenderCell(D3DManager::getInstance()->GetDeviceContext(), i);
+		if (!result)
+		{
+			return false;
+
+		}
+
+		// Render the cell buffers using the terrain shader.
+		result = ShaderManager->RenderTerrainShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetCellIndexCount(i), worldMatrix, viewMatrix,
+			projectionMatrix, TextureManager::getInstance()->GetTexture(0), TextureManager::getInstance()->GetTexture(1),
+			m_Light->GetDirection(), m_Light->GetDiffuseColor(), sandColor, grassColor);
+		if (!result)
+		{
+			return false;
+		}
+
+		// If needed then render the bounding box around this terrain cell using the color shader. 
+		if (m_cellLines)
+		{
+			m_Terrain->RenderCellLines(D3DManager::getInstance()->GetDeviceContext(), i);
+			ShaderManager->RenderColorShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetCellLinesIndexCount(i), worldMatrix, viewMatrix, projectionMatrix);
+			if (!result)
+			{
+				return false;
+			}
+		}
 	}
 
 	// Turn off wire frame rendering of the terrain if it was on.
