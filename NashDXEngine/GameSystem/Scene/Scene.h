@@ -48,7 +48,7 @@ private:
 	SkyDome* m_SkyDome;
 	Light* m_Light;
 	Terrain* m_Terrain;
-	bool m_displayUI, m_wireFrame, m_cellLines;
+	bool m_displayUI, m_wireFrame, m_cellLines, m_heightLocked;
 	XMFLOAT4 sandColor, grassColor;
 };
 
