@@ -15,6 +15,8 @@
 using namespace DirectX;
 using namespace std;
 
+#include "../../Noise/SimplexNoise.h"
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: Terrain
@@ -74,6 +76,8 @@ public:
 
 private:
 	bool LoadSetupFile(char*);
+	bool GenerateHeightMap();
+	bool GenerateBlendedHeightMap();
 	bool LoadBitmapHeightMap();
 	bool LoadRawHeightMap();
 	void ShutdownHeightMap();
@@ -94,7 +98,7 @@ private:
 	int m_vertexCount, m_indexCount;
 	int m_terrainHeight, m_terrainWidth;
 	float m_heightScale;
-	char *m_terrainFilename, *m_colorMapFilename;
+	char *m_terrainFilename, *m_colorMapFilename, *m_heightBlendMapFilename;
 	HeightMapType* m_heightMap;
 	ModelType* m_terrainModel;
 };

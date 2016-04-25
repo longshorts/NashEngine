@@ -38,7 +38,13 @@ bool Terrain::Initialize(ID3D11Device* device, char* setupFilename)
 	}
 
 	// Initialize the terrain height map with the data from the raw file.
-	result = LoadRawHeightMap();
+	/*result = LoadRawHeightMap();
+	if (!result)
+	{
+		return false;
+	}*/
+
+	result = GenerateBlendedHeightMap();
 	if (!result)
 	{
 		return false;
@@ -139,6 +145,12 @@ bool Terrain::LoadSetupFile(char* filename)
 		return false;
 	}
 
+	m_heightBlendMapFilename = new char[stringLength];
+	if (!m_heightBlendMapFilename)
+	{
+		return false;
+	}
+
 	// Open the setup file.  If it could not open the file then exit.
 	fin.open(filename);
 	if (fin.fail())
@@ -196,12 +208,169 @@ bool Terrain::LoadSetupFile(char* filename)
 	// Read in the color map file name.
 	fin >> m_colorMapFilename;
 
+	// Read up to the river blend map file name.
+	fin.get(input);
+	while (input != ':')
+	{
+		fin.get(input);
+	}
+
+	// Read in the river blend map file name.
+	fin >> m_heightBlendMapFilename;
+
 	// Close the setup file.
 	fin.close();
 
 	return true;
 }
 
+bool Terrain::GenerateHeightMap()
+{
+	int i, j, index;
+	float height;
+	float heightScale = 40;
+	SimplexNoise* noise = new SimplexNoise(0.005f, heightScale, 2.0f, 0.5f);
+
+	// Start by creating the array structure to hold the height map data.
+	m_heightMap = new HeightMapType[m_terrainWidth * m_terrainHeight];
+	if (!m_heightMap)
+	{
+		return false;
+	}
+
+	// Read the image data into the height map array.
+	for (j = 0; j<m_terrainHeight; j++)
+	{
+		for (i = 0; i<m_terrainWidth; i++)
+		{
+			//Index value taken from bitmap calc
+			//TODO recalculate to generate data from bottom left
+			index = (m_terrainWidth * (m_terrainHeight - 1 - j)) + i;
+
+			//Get height (y) from simplex noise
+			m_heightMap[index].y = noise->fractal(4,i,j) * heightScale;
+		}
+	}
+
+	return true;
+
+}
+
+bool Terrain::GenerateBlendedHeightMap()
+{
+	int error, imageSize, i, j, k, index;
+	FILE* filePtr;
+	unsigned long long count;
+	BITMAPFILEHEADER bitmapFileHeader;
+	BITMAPINFOHEADER bitmapInfoHeader;
+	unsigned char* bitmapImage;
+	unsigned char height;
+	float noiseHeightScale = 500.0f;
+	float terrainHeightScale = 20.0f;
+	SimplexNoise* noise = new SimplexNoise(0.005f, noiseHeightScale, 2.0f, 0.5f);
+
+
+	// Start by creating the array structure to hold the height map data.
+	m_heightMap = new HeightMapType[m_terrainWidth * m_terrainHeight];
+	if (!m_heightMap)
+	{
+		return false;
+	}
+
+	// Open the bitmap map file in binary.
+	error = fopen_s(&filePtr, m_heightBlendMapFilename, "rb");
+	if (error != 0)
+	{
+		return false;
+	}
+
+	// Read in the bitmap file header.
+	count = fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
+	if (count != 1)
+	{
+		return false;
+	}
+
+	// Read in the bitmap info header.
+	count = fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, filePtr);
+	if (count != 1)
+	{
+		return false;
+	}
+
+	// Make sure the height map dimensions are the same as the terrain dimensions for easy 1 to 1 mapping.
+	if ((bitmapInfoHeader.biHeight != m_terrainHeight) || (bitmapInfoHeader.biWidth != m_terrainWidth))
+	{
+		return false;
+	}
+
+	// Calculate the size of the bitmap image data.  
+	// Since we use non-divide by 2 dimensions (eg. 513x513) we need to add an extra byte to each line.
+	imageSize = m_terrainHeight * ((m_terrainWidth * 3) + 1);
+
+	// Allocate memory for the bitmap image data.
+	bitmapImage = new unsigned char[imageSize];
+	if (!bitmapImage)
+	{
+		return false;
+	}
+
+	// Move to the beginning of the bitmap data.
+	fseek(filePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
+
+	// Read in the bitmap image data.
+	count = fread(bitmapImage, 1, imageSize, filePtr);
+	if (count != imageSize)
+	{
+		return false;
+	}
+
+	// Close the file.
+	error = fclose(filePtr);
+	if (error != 0)
+	{
+		return false;
+	}
+
+	// Initialize the position in the image data buffer.
+	k = 0;
+
+	// Read the image data into the height map array.
+	for (j = 0; j<m_terrainHeight; j++)
+	{
+		for (i = 0; i<m_terrainWidth; i++)
+		{
+			// Bitmaps are upside down so load bottom to top into the height map array.
+			index = (m_terrainWidth * (m_terrainHeight - 1 - j)) + i;
+
+			// Get the grey scale pixel value from the bitmap image data at this location.
+			height = bitmapImage[k];
+
+			// Store the pixel value as the height at this point in the height map array.
+			//m_heightMap[index].y = (float)height;
+
+			//Get height (y) from simplex noise
+			//m_heightMap[index].y = noise->fractal(4, i, j) + terrainHeightScale*(float)height;
+			m_heightMap[index].y = noise->fractal(4, i, j) + (float)height*terrainHeightScale;
+
+			// Increment the bitmap image data index.
+			k += 3;
+		}
+
+		// Compensate for the extra byte at end of each line in non-divide by 2 bitmaps (eg. 513x513).
+		k++;
+	}
+
+	// Release the bitmap image data now that the height map array has been loaded.
+	delete[] bitmapImage;
+	bitmapImage = 0;
+
+	// Release the terrain filename now that is has been read in.
+	delete[] m_terrainFilename;
+	m_terrainFilename = 0;
+
+	return true;
+}
 
 bool Terrain::LoadBitmapHeightMap()
 {
