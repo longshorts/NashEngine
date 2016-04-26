@@ -418,7 +418,7 @@ void Scene::RenderRefractionToTexture()
 	m_Camera->Render();
 
 	// Get the matrices from the camera and d3d objects.
-	D3DManager::getInstance()->GetWorldMatrix(worldMatrix);
+	D3DManager::getInstance()->GetWTurnOnAlporldMatrix(worldMatrix);
 	m_Camera->GetViewMatrix(viewMatrix);
 	D3DManager::getInstance()->GetProjectionMatrix(projectionMatrix);
 
@@ -429,12 +429,12 @@ void Scene::RenderRefractionToTexture()
 		clipPlane);
 
 	// Reset the render target back to the original back buffer and not the render to texture anymore.
-	m_Direct3D->SetBackBufferRenderTarget();
+	D3DManager::getInstance()->SetBackBufferRenderTarget();
 
 	// Reset the viewport back to the original.
-	m_Direct3D->ResetViewport();*/
+	D3DManager::getInstance()->ResetViewport();
 
-	return;
+	return;*/
 }
 
 void Scene::RenderReflectionToTexture()
@@ -607,7 +607,7 @@ bool Scene::Render(ShaderManager* ShaderManager)
 	D3DManager::getInstance()->EnableAlphaBlending();
 
 	// Translate to the location of the water and render it.
-	worldMatrix = XMMatrixTranslation((float)(m_Terrain->GetTerrainWidth()/2), m_Water->GetWaterHeight(), (float)(m_Terrain->GetTerrainHeight() / 2));
+	worldMatrix = XMMatrixTranslation((float)(m_Terrain->GetTerrainWidth()/2), m_Water->GetWaterHeight()+XMScalarSin(TimerManager::getInstance()->GetTotalTime()*0.001f), (float)(m_Terrain->GetTerrainHeight() / 2));
 	m_Water->Render(D3DManager::getInstance()->GetDeviceContext());
 	result = ShaderManager->RenderWaterShader(D3DManager::getInstance()->GetDeviceContext(), m_Water->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, reflectionViewMatrix,
 		m_RefractionTexture->GetShaderResourceView(), m_ReflectionTexture->GetShaderResourceView(), m_Water->GetTexture(),

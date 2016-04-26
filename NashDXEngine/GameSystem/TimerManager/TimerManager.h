@@ -30,6 +30,7 @@ public:
 	void Frame();
 
 	float GetTime();
+	float GetTotalTime();
 
 private:
 	static TimerManager* instance;
@@ -38,6 +39,7 @@ private:
 	float m_ticksPerMs;
 	INT64 m_startTime;
 	float m_frameTime;
+	float m_totalTime;
 };
 
 #endif

@@ -54,6 +54,7 @@ void TimerManager::Frame()
 	timeDifference = (float)(currentTime - m_startTime);
 
 	m_frameTime = timeDifference / m_ticksPerMs;
+	m_totalTime += m_frameTime;
 
 	m_startTime = currentTime;
 
@@ -64,4 +65,9 @@ void TimerManager::Frame()
 float TimerManager::GetTime()
 {
 	return m_frameTime;
+}
+
+float TimerManager::GetTotalTime()
+{
+	return m_totalTime;
 }

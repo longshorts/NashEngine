@@ -140,7 +140,7 @@ float4 WaterPixelShader(PixelInputType input) : SV_TARGET
 
 	lightIntensity = saturate(dot(normal, lightDir));
 
-	color = float4(lightIntensity,0,1,1.0f);
+	color = saturate(float4(0,0,1,0.1f) * lightIntensity);
 
 	return color;
 }

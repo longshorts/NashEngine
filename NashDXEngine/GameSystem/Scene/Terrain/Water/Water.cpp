@@ -102,7 +102,7 @@ int Water::GetIndexCount()
 
 ID3D11ShaderResourceView* Water::GetTexture()
 {
-	return TextureManager::getInstance()->GetTexture(3);
+	return TextureManager::getInstance()->GetTexture(2);
 }
 
 

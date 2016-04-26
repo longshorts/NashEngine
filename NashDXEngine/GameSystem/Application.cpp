@@ -111,8 +111,8 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	result = TextureManager::getInstance()->LoadTexture(
-		D3DManager::getInstance()->GetDevice(), D3DManager::getInstance()->GetDeviceContext(), "../Assets/textures/waternormal.dds", 3);
+	//result = TextureManager::getInstance()->LoadTexture(
+		//D3DManager::getInstance()->GetDevice(), D3DManager::getInstance()->GetDeviceContext(), "../Assets/textures/waternormal.dds", 3);
 
 	//Initialize the Timer singleton
 	new TimerManager();
