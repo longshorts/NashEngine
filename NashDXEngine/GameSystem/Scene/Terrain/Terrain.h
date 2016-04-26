@@ -12,6 +12,7 @@
 #include <directxmath.h>
 #include <fstream>
 #include <stdio.h>
+#include <vector>
 using namespace DirectX;
 using namespace std;
 
@@ -21,6 +22,7 @@ using namespace std;
 #include "TerrainCell.h"
 #include "../../Noise/SimplexNoise.h"
 #include "Frustum\Frustum.h"
+#include "../../Shader/ShaderManager.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,6 +80,7 @@ public:
 
 	void Frame();
 	
+	bool Render(ID3D11DeviceContext*, Frustum*);
 	bool RenderCell(ID3D11DeviceContext*, int, Frustum*);
 	void RenderCellLines(ID3D11DeviceContext*, int);
 
@@ -87,6 +90,8 @@ public:
 	int GetRenderCount();
 	int GetCellsDrawn();
 	int GetCellsCulled();
+	int GetTerrainWidth();
+	int GetTerrainHeight();
 
 	bool GetHeightAtPosition(float, float, float&);
 
@@ -107,6 +112,7 @@ private:
 	bool LoadTerrainCells(ID3D11Device*);
 	void ShutdownTerrainCells();
 	bool CheckHeightOfTriangle(float, float, float&, float[3], float[3], float[3]);
+	bool SmoothHeightMap();
 
 private:
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;

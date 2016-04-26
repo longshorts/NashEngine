@@ -99,6 +99,18 @@
     <ClCompile Include="GameSystem\Scene\Terrain\Frustum\Frustum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameSystem\Scene\Terrain\Water\Water.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSystem\Shader\WaterShader\WaterShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSystem\Texture\RenderTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSystem\Shader\ReflectionShader\ReflectionShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameSystem\System.h">
@@ -185,11 +197,25 @@
     <ClInclude Include="GameSystem\Scene\Terrain\Frustum\Frustum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameSystem\Scene\Terrain\Water\Water.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSystem\Shader\WaterShader\WaterShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSystem\Texture\RenderTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSystem\Shader\ReflectionShader\ReflectionShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter03_src\source\texture.ps" />
     <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter03_src\source\texture.vs" />
     <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter06_src\source\terrain.ps" />
     <None Include="..\..\..\Documents\Visual Studio 2015\Projects\dx11ter06_src\source\terrain.vs" />
+    <None Include="..\..\..\Documents\Visual Studio 2015\Projects\tersrc16\source\water.ps" />
+    <None Include="..\..\..\Documents\Visual Studio 2015\Projects\tersrc16\source\water.vs" />
   </ItemGroup>
 </Project>

@@ -76,14 +76,7 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	//Load textures into the texture manager
 	/*result = TextureManager::getInstance()->LoadTexture(
-		D3DManager::getInstance()->GetDevice(), D3DManager::getInstance()->GetDeviceContext(), "../Assets/textures/test.tga", 0);
-	if (!result) {
-		return false;
-	}*/
-
-	result = TextureManager::getInstance()->LoadTexture(
 		D3DManager::getInstance()->GetDevice(), D3DManager::getInstance()->GetDeviceContext(), "../Assets/textures/dirt01d.tga", 1);
 	if (!result) {
 		return false;
@@ -94,7 +87,32 @@ bool Application::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result)
 	{
 		return false;
+	}*/
+
+	// Load textures into the texture manager.
+	result = TextureManager::getInstance()->LoadTexture(
+		D3DManager::getInstance()->GetDevice(), D3DManager::getInstance()->GetDeviceContext(), "../Assets/textures/rock01d.tga", 0);
+	if (!result)
+	{
+		return false;
 	}
+
+	result = TextureManager::getInstance()->LoadTexture(
+		D3DManager::getInstance()->GetDevice(), D3DManager::getInstance()->GetDeviceContext(), "../Assets/textures/rock01n.tga", 1);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = TextureManager::getInstance()->LoadTexture(
+		D3DManager::getInstance()->GetDevice(), D3DManager::getInstance()->GetDeviceContext(), "../Assets/textures/dirt01n.tga", 2);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = TextureManager::getInstance()->LoadTexture(
+		D3DManager::getInstance()->GetDevice(), D3DManager::getInstance()->GetDeviceContext(), "../Assets/textures/waternormal.dds", 3);
 
 	//Initialize the Timer singleton
 	new TimerManager();

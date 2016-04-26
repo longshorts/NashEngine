@@ -13,6 +13,9 @@ Scene::Scene()
 	m_Frustum = 0;
 	m_SkyDome = 0;
 	m_Terrain = 0;
+	m_RefractionTexture = 0;
+	m_ReflectionTexture = 0;
+	m_Water = 0;
 }
 
 
@@ -81,8 +84,8 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 	}
 
 	// Set the initial position and rotation.
-	m_Position->SetPosition(128.0f, 10.0f, -10.0f);
-	m_Position->SetRotation(0.0f, 0.0f, 0.0f);
+	m_Position->SetPosition(283.0f, 55.0f, 474.0f);
+	m_Position->SetRotation(9.0f, 86.0f, 0.0f);
 
 	// Create the frustum object.
 	m_Frustum = new Frustum;
@@ -124,14 +127,59 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 		return false;
 	}
 
+	// Create the refraction render to texture object.
+	m_RefractionTexture = new RenderTexture;
+	if (!m_RefractionTexture)
+	{
+		return false;
+	}
+
+	// Initialize the refraction render to texture object.
+	result = m_RefractionTexture->Initialize(Direct3D->GetDevice(), screenWidth, screenHeight, screenDepth, 0.1f);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the refraction render to texture object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the reflection render to texture object.
+	m_ReflectionTexture = new RenderTexture;
+	if (!m_ReflectionTexture)
+	{
+		return false;
+	}
+
+	// Initialize the reflection render to texture object.
+	result = m_ReflectionTexture->Initialize(Direct3D->GetDevice(), screenWidth, screenHeight, screenDepth, 0.1f);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the reflection render to texture object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the water object.
+	m_Water = new Water;
+	if (!m_Water)
+	{
+		return false;
+	}
+
+	// Initialize the water object.
+	result = m_Water->Initialize(Direct3D->GetDevice(), L"../Engine/data/waternormal.dds", 14.75f, (float)(m_Terrain->GetTerrainWidth()/2));
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the water object.", L"Error", MB_OK);
+		return false;
+	}
+
 	// Set the UI to display by default.
 	m_displayUI = true;
 
 	// Set wire frame rendering initially to enabled.
-	m_wireFrame = true;
+	m_wireFrame = false;
 
 	// Set the rendering of cell lines initially to enabled.
-	m_cellLines = true;
+	m_cellLines = false;
 
 	// Set the user locked to the terrain height for movement.
 	m_heightLocked = true;
@@ -142,6 +190,30 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 
 void Scene::Shutdown()
 {
+	// Release the water object.
+	if (m_Water)
+	{
+		m_Water->Shutdown();
+		delete m_Water;
+		m_Water = 0;
+	}
+
+	// Release the reflection render to texture object.
+	if (m_ReflectionTexture)
+	{
+		m_ReflectionTexture->Shutdown();
+		delete m_ReflectionTexture;
+		m_ReflectionTexture = 0;
+	}
+
+	// Release the refraction render to texture object.
+	if (m_RefractionTexture)
+	{
+		m_RefractionTexture->Shutdown();
+		delete m_RefractionTexture;
+		m_RefractionTexture = 0;
+	}
+
 	// Release the terrain object.
 	if (m_Terrain)
 	{
@@ -234,6 +306,15 @@ bool Scene::Frame(ShaderManager* ShaderManager, float frameTime, int fps)
 		}
 	}
 
+	// Do the water frame processing.
+	m_Water->Frame();
+
+	// Render the refraction of the scene to a texture.
+	RenderRefractionToTexture();
+
+	// Render the reflection of the scene to a texture.
+	RenderReflectionToTexture();
+
 	// Render the graphics.
 	result = Render(ShaderManager);
 	if (!result)
@@ -318,10 +399,125 @@ void Scene::HandleMovementInput(InputManager* Input, float frameTime)
 	return;
 }
 
+void Scene::RenderRefractionToTexture()
+{
+	/*XMFLOAT4 clipPlane;
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+
+
+	// Setup a clipping plane based on the height of the water to clip everything above it to create a refraction.
+	clipPlane = XMFLOAT4(0.0f, -1.0f, 0.0f, m_Water->GetWaterHeight() + 0.1f);
+
+	// Set the render target to be the refraction render to texture.
+	m_RefractionTexture->SetRenderTarget(D3DManager::getInstance()->GetDeviceContext());
+
+	// Clear the refraction render to texture.
+	m_RefractionTexture->ClearRenderTarget(D3DManager::getInstance()->GetDeviceContext(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+	// Generate the view matrix based on the camera's position.
+	m_Camera->Render();
+
+	// Get the matrices from the camera and d3d objects.
+	D3DManager::getInstance()->GetWorldMatrix(worldMatrix);
+	m_Camera->GetViewMatrix(viewMatrix);
+	D3DManager::getInstance()->GetProjectionMatrix(projectionMatrix);
+
+	// Render the terrain using the reflection shader and the refraction clip plane to produce the refraction effect.
+	m_Terrain->Render(D3DManager::getInstance()->GetDeviceContext());
+	m_ReflectionShader->Render(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+		m_Terrain->GetColorTexture(), m_Terrain->GetNormalTexture(), m_Light->GetDiffuseColor(), m_Light->GetDirection(), 2.0f,
+		clipPlane);
+
+	// Reset the render target back to the original back buffer and not the render to texture anymore.
+	m_Direct3D->SetBackBufferRenderTarget();
+
+	// Reset the viewport back to the original.
+	m_Direct3D->ResetViewport();*/
+
+	return;
+}
+
+void Scene::RenderReflectionToTexture()
+{
+	/*D3DXVECTOR4 clipPlane;
+	D3DXMATRIX reflectionViewMatrix, worldMatrix, projectionMatrix;
+	D3DXVECTOR3 cameraPosition;
+
+
+	// Setup a clipping plane based on the height of the water to clip everything below it.
+	clipPlane = D3DXVECTOR4(0.0f, 1.0f, 0.0f, -m_Water->GetWaterHeight());
+
+	// Set the render target to be the reflection render to texture.
+	m_ReflectionTexture->SetRenderTarget(m_Direct3D->GetDeviceContext());
+
+	// Clear the reflection render to texture.
+	m_ReflectionTexture->ClearRenderTarget(m_Direct3D->GetDeviceContext(), 0.0f, 0.0f, 0.0f, 1.0f);
+
+	// Use the camera to render the reflection and create a reflection view matrix.
+	m_Camera->RenderReflection(m_Water->GetWaterHeight());
+
+	// Get the camera reflection view matrix instead of the normal view matrix.
+	m_Camera->GetReflectionViewMatrix(reflectionViewMatrix);
+
+	// Get the world and projection matrices from the d3d object.
+	m_Direct3D->GetWorldMatrix(worldMatrix);
+	m_Direct3D->GetProjectionMatrix(projectionMatrix);
+
+	// Get the position of the camera.
+	cameraPosition = m_Camera->GetPosition();
+
+	// Invert the Y coordinate of the camera around the water plane height for the reflected camera position.
+	cameraPosition.y = -cameraPosition.y + (m_Water->GetWaterHeight() * 2.0f);
+
+	// Translate the sky dome and sky plane to be centered around the reflected camera position.
+	D3DXMatrixTranslation(&worldMatrix, cameraPosition.x, cameraPosition.y, cameraPosition.z);
+
+	// Turn off back face culling and the Z buffer.
+	m_Direct3D->TurnOffCulling();
+	m_Direct3D->TurnZBufferOff();
+
+	// Render the sky dome using the reflection view matrix.
+	m_SkyDome->Render(m_Direct3D->GetDeviceContext());
+	m_SkyDomeShader->Render(m_Direct3D->GetDeviceContext(), m_SkyDome->GetIndexCount(), worldMatrix, reflectionViewMatrix, projectionMatrix,
+		m_SkyDome->GetApexColor(), m_SkyDome->GetCenterColor());
+
+	// Enable back face culling.
+	m_Direct3D->TurnOnCulling();
+
+	// Enable additive blending so the clouds blend with the sky dome color.
+	m_Direct3D->EnableSecondBlendState();
+
+	// Render the sky plane using the sky plane shader.
+	m_SkyPlane->Render(m_Direct3D->GetDeviceContext());
+	m_SkyPlaneShader->Render(m_Direct3D->GetDeviceContext(), m_SkyPlane->GetIndexCount(), worldMatrix, reflectionViewMatrix, projectionMatrix,
+		m_SkyPlane->GetCloudTexture(), m_SkyPlane->GetPerturbTexture(), m_SkyPlane->GetTranslation(), m_SkyPlane->GetScale(),
+		m_SkyPlane->GetBrightness());
+
+	// Turn off blending and enable the Z buffer again.
+	m_Direct3D->TurnOffAlphaBlending();
+	m_Direct3D->TurnZBufferOn();
+
+	// Reset the world matrix.
+	m_Direct3D->GetWorldMatrix(worldMatrix);
+
+	// Render the terrain using the reflection view matrix and reflection clip plane.
+	m_Terrain->Render(m_Direct3D->GetDeviceContext());
+	m_ReflectionShader->Render(m_Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, reflectionViewMatrix, projectionMatrix,
+		m_Terrain->GetColorTexture(), m_Terrain->GetNormalTexture(), m_Light->GetDiffuseColor(), m_Light->GetDirection(), 2.0f,
+		clipPlane);
+
+	// Reset the render target back to the original back buffer and not the render to texture anymore.
+	m_Direct3D->SetBackBufferRenderTarget();
+
+	// Reset the viewport back to the original.
+	m_Direct3D->ResetViewport();
+	*/
+	return;
+}
 
 bool Scene::Render(ShaderManager* ShaderManager)
 {
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix;
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix, baseViewMatrix, orthoMatrix, reflectionViewMatrix;
 	bool result;
 	XMFLOAT3 cameraPosition;
 	int i;
@@ -330,12 +526,16 @@ bool Scene::Render(ShaderManager* ShaderManager)
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
 
+	// Generate the reflection matrix based on the camera's position and the height of the water.
+	m_Camera->RenderReflection(m_Water->GetWaterHeight());
+
 	// Get the world, view, and projection matrices from the camera and d3d objects.
 	D3DManager::getInstance()->GetWorldMatrix(worldMatrix);
 	m_Camera->GetViewMatrix(viewMatrix);
 	D3DManager::getInstance()->GetProjectionMatrix(projectionMatrix);
 	m_Camera->GetBaseViewMatrix(baseViewMatrix);
 	D3DManager::getInstance()->GetOrthoMatrix(orthoMatrix);
+	m_Camera->GetReflectionViewMatrix(reflectionViewMatrix);
 
 	// Get the position of the camera.
 	cameraPosition = m_Camera->GetPosition();
@@ -385,7 +585,7 @@ bool Scene::Render(ShaderManager* ShaderManager)
 			// Render the cell buffers using the terrain shader.
 			result = ShaderManager->RenderTerrainShader(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetCellIndexCount(i), worldMatrix, viewMatrix,
 				projectionMatrix, TextureManager::getInstance()->GetTexture(0), TextureManager::getInstance()->GetTexture(1),
-				m_Light->GetDirection(), m_Light->GetDiffuseColor(), sandColor, grassColor);
+				TextureManager::getInstance()->GetTexture(2), m_Light->GetDirection(), m_Light->GetDiffuseColor(), sandColor, grassColor);
 			if (!result)
 			{
 				return false;
@@ -404,12 +604,30 @@ bool Scene::Render(ShaderManager* ShaderManager)
 			}
 		}
 	}
+	D3DManager::getInstance()->EnableAlphaBlending();
+
+	// Translate to the location of the water and render it.
+	worldMatrix = XMMatrixTranslation((float)(m_Terrain->GetTerrainWidth()/2), m_Water->GetWaterHeight(), (float)(m_Terrain->GetTerrainHeight() / 2));
+	m_Water->Render(D3DManager::getInstance()->GetDeviceContext());
+	result = ShaderManager->RenderWaterShader(D3DManager::getInstance()->GetDeviceContext(), m_Water->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, reflectionViewMatrix,
+		m_RefractionTexture->GetShaderResourceView(), m_ReflectionTexture->GetShaderResourceView(), m_Water->GetTexture(),
+		m_Camera->GetPosition(), m_Water->GetNormalMapTiling(), m_Water->GetWaterTranslation(), m_Water->GetReflectRefractScale(),
+		m_Water->GetRefractionTint(), m_Light->GetDirection(), m_Water->GetSpecularShininess());
+	if (!result)
+	{
+		return false;
+	}
+
+	D3DManager::getInstance()->DisableAlphaBlending();
 
 	// Turn off wire frame rendering of the terrain if it was on.
 	if (m_wireFrame)
 	{
 		D3DManager::getInstance()->DisableWireframe();
 	}
+
+	// Reset the world matrix.
+	D3DManager::getInstance()->GetWorldMatrix(worldMatrix);
 
 	// Update the render counts in the UI.
 	result = m_UserInterface->UpdateRenderCounts(D3DManager::getInstance()->GetDeviceContext(), m_Terrain->GetRenderCount(), m_Terrain->GetCellsDrawn(),

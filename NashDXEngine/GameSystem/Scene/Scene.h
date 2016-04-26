@@ -12,6 +12,7 @@
 #include "../InputManager/InputManager.h"
 #include "../Shader/ShaderManager.h"
 #include "../Texture/TextureManager.h"
+#include "../Texture/RenderTexture.h"
 #include "../TimerManager/TimerManager.h"
 #include "../UI/UserInterface.h"
 #include "../Camera/Camera.h"
@@ -20,6 +21,7 @@
 #include "Terrain/Frustum/Frustum.h"
 #include "Model/SkyDome.h"
 #include "Terrain/Terrain.h"
+#include "Terrain/Water/Water.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,6 +40,8 @@ public:
 
 private:
 	void HandleMovementInput(InputManager*, float);
+	void RenderRefractionToTexture();
+	void RenderReflectionToTexture();
 	bool Render(ShaderManager*);
 
 private:
@@ -48,6 +52,10 @@ private:
 	SkyDome* m_SkyDome;
 	Light* m_Light;
 	Terrain* m_Terrain;
+	Water* m_Water;
+	RenderTexture *m_RefractionTexture, *m_ReflectionTexture;
+
+
 	bool m_displayUI, m_wireFrame, m_cellLines, m_heightLocked;
 	XMFLOAT4 sandColor, grassColor;
 };

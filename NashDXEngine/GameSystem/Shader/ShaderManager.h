@@ -15,6 +15,8 @@
 #include "FontShader/FontShader.h"
 #include "SkyDomeShader/SkyDomeShader.h"
 #include "TerrainShader/TerrainShader.h"
+#include "WaterShader/WaterShader.h"
+#include "ReflectionShader/ReflectionShader.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +38,12 @@ public:
 	bool RenderFontShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, XMFLOAT4);
 	bool RenderSkyDomeShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, XMFLOAT4, XMFLOAT4);
 	bool RenderTerrainShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, ID3D11ShaderResourceView*,
-		XMFLOAT3, XMFLOAT4, XMFLOAT4, XMFLOAT4);
+		ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT4, XMFLOAT4, XMFLOAT4);
+	bool RenderWaterShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, ID3D11ShaderResourceView*,
+		ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT2, float, float, XMFLOAT4, XMFLOAT3, float);
+	bool RenderReflectionShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX,
+		XMMATRIX, ID3D11ShaderResourceView*, ID3D11ShaderResourceView*,
+		XMFLOAT4, XMFLOAT3, float, XMFLOAT4);
 
 private:
 	ColorShader* m_ColorShader;
@@ -45,6 +52,8 @@ private:
 	FontShader* m_FontShader;
 	SkyDomeShader* m_SkyDomeShader;
 	TerrainShader* m_TerrainShader;
+	WaterShader* m_WaterShader;
+	ReflectionShader* m_ReflectionShader;
 };
 
 #endif

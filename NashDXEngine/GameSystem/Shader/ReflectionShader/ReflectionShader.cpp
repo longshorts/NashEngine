@@ -1,37 +1,38 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Filename: TerrainShader.cpp
+// Filename: ReflectionShader.cpp
 ////////////////////////////////////////////////////////////////////////////////
-#include "TerrainShader.h"
+#include "ReflectionShader.h"
 
 
-TerrainShader::TerrainShader()
+ReflectionShader::ReflectionShader()
 {
 	m_vertexShader = 0;
 	m_pixelShader = 0;
 	m_layout = 0;
-	m_matrixBuffer = 0;
 	m_sampleState = 0;
+	m_matrixBuffer = 0;
+	m_clipPlaneBuffer = 0;
 	m_lightBuffer = 0;
 }
 
 
-TerrainShader::TerrainShader(const TerrainShader& other)
+ReflectionShader::ReflectionShader(const ReflectionShader& other)
 {
 }
 
 
-TerrainShader::~TerrainShader()
+ReflectionShader::~ReflectionShader()
 {
 }
 
 
-bool TerrainShader::Initialize(ID3D11Device* device, HWND hwnd)
+bool ReflectionShader::Initialize(ID3D11Device* device, HWND hwnd)
 {
 	bool result;
 
 
 	// Initialize the vertex and pixel shaders.
-	result = InitializeShader(device, hwnd, L"../NashDXEngine/Shaders/terrain.vs", L"../NashDXEngine/Shaders/terrain.ps");
+	result = InitializeShader(device, hwnd, L"../Engine/reflection.vs", L"../Engine/reflection.ps");
 	if (!result)
 	{
 		return false;
@@ -41,7 +42,7 @@ bool TerrainShader::Initialize(ID3D11Device* device, HWND hwnd)
 }
 
 
-void TerrainShader::Shutdown()
+void ReflectionShader::Shutdown()
 {
 	// Shutdown the vertex and pixel shaders as well as the related objects.
 	ShutdownShader();
@@ -50,15 +51,16 @@ void TerrainShader::Shutdown()
 }
 
 
-bool TerrainShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* normalMap,
-	ID3D11ShaderResourceView* normalMap2, XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor, XMFLOAT4 sandColor, XMFLOAT4 grassColor)
+bool ReflectionShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* colorTexture, ID3D11ShaderResourceView* normalTexture,
+	XMFLOAT4 lightDiffuseColor, XMFLOAT3 lightDirection, float colorTextureBrightness, XMFLOAT4 clipPlane)
 {
 	bool result;
 
 
 	// Set the shader parameters that it will use for rendering.
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, texture, normalMap, normalMap2, lightDirection, diffuseColor, sandColor, grassColor);
+	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, colorTexture, normalTexture, lightDiffuseColor,
+		lightDirection, colorTextureBrightness, clipPlane);
 	if (!result)
 	{
 		return false;
@@ -71,7 +73,7 @@ bool TerrainShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, X
 }
 
 
-bool TerrainShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
+bool ReflectionShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
@@ -79,10 +81,10 @@ bool TerrainShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsF
 	ID3D10Blob* pixelShaderBuffer;
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[6];
 	unsigned int numElements;
-	D3D11_BUFFER_DESC matrixBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
+	D3D11_BUFFER_DESC matrixBufferDesc;
+	D3D11_BUFFER_DESC clipPlaneBufferDesc;
 	D3D11_BUFFER_DESC lightBufferDesc;
-	D3D11_BUFFER_DESC colorBufferDesc;
 
 
 	// Initialize the pointers this function will use to null.
@@ -91,8 +93,8 @@ bool TerrainShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsF
 	pixelShaderBuffer = 0;
 
 	// Compile the vertex shader code.
-	result = D3DCompileFromFile(vsFilename, NULL, NULL, "TerrainVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
-		&vertexShaderBuffer, &errorMessage);
+	result = D3DX11CompileFromFile(vsFilename, NULL, NULL, "ReflectionVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
+		&vertexShaderBuffer, &errorMessage, NULL);
 	if (FAILED(result))
 	{
 		// If the shader failed to compile it should have writen something to the error message.
@@ -110,8 +112,8 @@ bool TerrainShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsF
 	}
 
 	// Compile the pixel shader code.
-	result = D3DCompileFromFile(psFilename, NULL, NULL, "TerrainPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
-		&pixelShaderBuffer, &errorMessage);
+	result = D3DX11CompileFromFile(psFilename, NULL, NULL, "ReflectionPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
+		&pixelShaderBuffer, &errorMessage, NULL);
 	if (FAILED(result))
 	{
 		// If the shader failed to compile it should have writen something to the error message.
@@ -185,7 +187,7 @@ bool TerrainShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsF
 
 	polygonLayout[5].SemanticName = "COLOR";
 	polygonLayout[5].SemanticIndex = 0;
-	polygonLayout[5].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	polygonLayout[5].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	polygonLayout[5].InputSlot = 0;
 	polygonLayout[5].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	polygonLayout[5].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -195,8 +197,8 @@ bool TerrainShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsF
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
 	// Create the vertex input layout.
-	result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(),
-		vertexShaderBuffer->GetBufferSize(), &m_layout);
+	result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(),
+		&m_layout);
 	if (FAILED(result))
 	{
 		return false;
@@ -208,21 +210,6 @@ bool TerrainShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsF
 
 	pixelShaderBuffer->Release();
 	pixelShaderBuffer = 0;
-
-	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
-	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
-	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	matrixBufferDesc.MiscFlags = 0;
-	matrixBufferDesc.StructureByteStride = 0;
-
-	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
-	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
 
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -246,6 +233,36 @@ bool TerrainShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsF
 		return false;
 	}
 
+	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
+	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
+	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	matrixBufferDesc.MiscFlags = 0;
+	matrixBufferDesc.StructureByteStride = 0;
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Setup the description of the clip plane dynamic constant buffer that is in the vertex shader.
+	clipPlaneBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	clipPlaneBufferDesc.ByteWidth = sizeof(ClipPlaneBufferType);
+	clipPlaneBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	clipPlaneBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	clipPlaneBufferDesc.MiscFlags = 0;
+	clipPlaneBufferDesc.StructureByteStride = 0;
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	result = device->CreateBuffer(&clipPlaneBufferDesc, NULL, &m_clipPlaneBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
 	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
 	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
@@ -261,26 +278,11 @@ bool TerrainShader::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsF
 		return false;
 	}
 
-	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
-	colorBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	colorBufferDesc.ByteWidth = sizeof(LightBufferType);
-	colorBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	colorBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	colorBufferDesc.MiscFlags = 0;
-	colorBufferDesc.StructureByteStride = 0;
-
-	// Create the constant buffer pointer so we can access the pixel shader constant buffer from within this class.
-	result = device->CreateBuffer(&colorBufferDesc, NULL, &m_colorBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
 	return true;
 }
 
 
-void TerrainShader::ShutdownShader()
+void ReflectionShader::ShutdownShader()
 {
 	// Release the light constant buffer.
 	if (m_lightBuffer)
@@ -289,11 +291,11 @@ void TerrainShader::ShutdownShader()
 		m_lightBuffer = 0;
 	}
 
-	// Release the sampler state.
-	if (m_sampleState)
+	// Release the clip plane constant buffer.
+	if (m_clipPlaneBuffer)
 	{
-		m_sampleState->Release();
-		m_sampleState = 0;
+		m_clipPlaneBuffer->Release();
+		m_clipPlaneBuffer = 0;
 	}
 
 	// Release the matrix constant buffer.
@@ -301,6 +303,13 @@ void TerrainShader::ShutdownShader()
 	{
 		m_matrixBuffer->Release();
 		m_matrixBuffer = 0;
+	}
+
+	// Release the sampler state.
+	if (m_sampleState)
+	{
+		m_sampleState->Release();
+		m_sampleState = 0;
 	}
 
 	// Release the layout.
@@ -328,10 +337,10 @@ void TerrainShader::ShutdownShader()
 }
 
 
-void TerrainShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
+void ReflectionShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
 {
 	char* compileErrors;
-	unsigned long long bufferSize, i;
+	unsigned long bufferSize, i;
 	ofstream fout;
 
 
@@ -364,16 +373,17 @@ void TerrainShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd
 }
 
 
-bool TerrainShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* normalMap,
-	ID3D11ShaderResourceView* normalMap2, XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor, XMFLOAT4 sandColor, XMFLOAT4 grassColor)
+bool ReflectionShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* colorTexture,
+	ID3D11ShaderResourceView* normalTexture, XMFLOAT4 lightDiffuseColor, XMFLOAT3 lightDirection,
+	float colorTextureBrightness, XMFLOAT4 clipPlane)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	MatrixBufferType* dataPtr;
 	unsigned int bufferNumber;
+	MatrixBufferType* dataPtr;
+	ClipPlaneBufferType* dataPtr1;
 	LightBufferType* dataPtr2;
-	ColorBufferType* dataPtr3;
 
 
 	// Transpose the matrices to prepare them for the shader.
@@ -402,13 +412,30 @@ bool TerrainShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMA
 	// Set the position of the constant buffer in the vertex shader.
 	bufferNumber = 0;
 
-	// Finanly set the constant buffer in the vertex shader with the updated values.
+	// Now set the constant buffer in the vertex shader with the updated values.
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 
-	// Set shader texture resources in the pixel shader.
-	deviceContext->PSSetShaderResources(0, 1, &texture);
-	deviceContext->PSSetShaderResources(1, 1, &normalMap);
-	deviceContext->PSSetShaderResources(2, 1, &normalMap2);
+	// Lock the clip plane constant buffer so it can be written to.
+	result = deviceContext->Map(m_clipPlaneBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Get a pointer to the data in the clip plane constant buffer.
+	dataPtr1 = (ClipPlaneBufferType*)mappedResource.pData;
+
+	// Copy the clip plane into the clip plane constant buffer.
+	dataPtr1->clipPlane = clipPlane;
+
+	// Unlock the buffer.
+	deviceContext->Unmap(m_clipPlaneBuffer, 0);
+
+	// Set the position of the clip plane constant buffer in the vertex shader.
+	bufferNumber = 1;
+
+	// Now set the clip plane constant buffer in the vertex shader with the updated values.
+	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_clipPlaneBuffer);
 
 	// Lock the light constant buffer so it can be written to.
 	result = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -417,15 +444,15 @@ bool TerrainShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMA
 		return false;
 	}
 
-	// Get a pointer to the data in the light constant buffer.
+	// Get a pointer to the data in the constant buffer.
 	dataPtr2 = (LightBufferType*)mappedResource.pData;
 
 	// Copy the lighting variables into the constant buffer.
-	dataPtr2->diffuseColor = diffuseColor;
+	dataPtr2->lightDiffuseColor = lightDiffuseColor;
 	dataPtr2->lightDirection = lightDirection;
-	dataPtr2->padding = 0.0f;
+	dataPtr2->colorTextureBrightness = colorTextureBrightness;
 
-	// Unlock the light constant buffer.
+	// Unlock the constant buffer.
 	deviceContext->Unmap(m_lightBuffer, 0);
 
 	// Set the position of the light constant buffer in the pixel shader.
@@ -434,46 +461,27 @@ bool TerrainShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMA
 	// Finally set the light constant buffer in the pixel shader with the updated values.
 	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
 
-	// Lock the color constant buffer so it can be written to.
-	result = deviceContext->Map(m_colorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	// Get a pointer to the data in the color constant buffer.
-	dataPtr3 = (ColorBufferType*)mappedResource.pData;
-
-	// Copy the color data into the color constant buffer.
-	dataPtr3->sandColor = sandColor;
-	dataPtr3->grassColor = grassColor;
-
-	// Unlock the color constant buffer.
-	deviceContext->Unmap(m_colorBuffer, 0);
-
-	// Set the position of the color constant buffer in the pixel shader.
-	bufferNumber = 1;
-
-	// Now set the color constant buffer in the pixel shader with the updated color values.
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_colorBuffer);
+	// Set the texture resources in the pixel shader.
+	deviceContext->PSSetShaderResources(0, 1, &colorTexture);
+	deviceContext->PSSetShaderResources(1, 1, &normalTexture);
 
 	return true;
 }
 
 
-void TerrainShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
+void ReflectionShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
 {
 	// Set the vertex input layout.
 	deviceContext->IASetInputLayout(m_layout);
 
-	// Set the vertex and pixel shaders that will be used to render.
+	// Set the vertex and pixel shaders that will be used to render this triangle.
 	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
 	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
 
 	// Set the sampler state in the pixel shader.
 	deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 
-	// Render the polygon data.
+	// Render the triangle.
 	deviceContext->DrawIndexed(indexCount, 0, 0);
 
 	return;
