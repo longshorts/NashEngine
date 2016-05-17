@@ -172,8 +172,22 @@ bool Scene::Initialize(HWND hwnd, int screenWidth, int screenHeight, float scree
 		return false;
 	}
 
+	m_TreeModel = new Model;
+	if (!result)
+	{
+		return false;
+	}
+
+	//Initialize the tree object
+	result = m_TreeModel->Initialize(D3DManager::getInstance()->GetDevice(), "../Assets/Models/lowpolytree.txt", L"../Engine/data/rock01n.tga");
+	if(!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the tree object.", L"Error", MB_OK);
+		return false;
+	}
+
 	// Set the UI to display by default.
-	m_displayUI = true;
+	m_displayUI = false;
 
 	// Set wire frame rendering initially to enabled.
 	m_wireFrame = false;
@@ -620,6 +634,11 @@ bool Scene::Render(ShaderManager* ShaderManager)
 
 	D3DManager::getInstance()->DisableAlphaBlending();
 
+	// Reset the world matrix.
+	D3DManager::getInstance()->GetWorldMatrix(worldMatrix);
+
+	m_TreeModel->Render(D3DManager::getInstance()->GetDeviceContext());
+
 	// Turn off wire frame rendering of the terrain if it was on.
 	if (m_wireFrame)
 	{
@@ -651,4 +670,8 @@ bool Scene::Render(ShaderManager* ShaderManager)
 	D3DManager::getInstance()->EndScene();
 
 	return true;
+}
+
+bool Scene::isHeightLocked() {
+	return m_heightLocked;
 }

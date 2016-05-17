@@ -20,6 +20,7 @@
 #include "Position/Position.h"
 #include "Terrain/Frustum/Frustum.h"
 #include "Model/SkyDome.h"
+#include "Model/Model.h"
 #include "Terrain/Terrain.h"
 #include "Terrain/Water/Water.h"
 
@@ -37,6 +38,7 @@ public:
 	bool Initialize(HWND, int, int, float);
 	void Shutdown();
 	bool Frame(ShaderManager*, float, int);
+	bool isHeightLocked();
 
 private:
 	void HandleMovementInput(InputManager*, float);
@@ -53,6 +55,7 @@ private:
 	Light* m_Light;
 	Terrain* m_Terrain;
 	Water* m_Water;
+	Model* m_TreeModel;
 	RenderTexture *m_RefractionTexture, *m_ReflectionTexture;
 
 

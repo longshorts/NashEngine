@@ -3,8 +3,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "Position.h"
 
-const float Position::maxSpeed = 25.0f;
-const float Position::stepSpeed = 0.01f;
+const float Position::maxSpeed = 0.1f;
+const float Position::stepSpeed = 0.001f;
 
 Position::Position()
 {

@@ -171,6 +171,7 @@
     <ClInclude Include="GameSystem\Camera\Camera.h" />
     <ClInclude Include="GameSystem\Direct3DManager\D3DManager.h" />
     <ClInclude Include="GameSystem\FPSManager\FPSManager.h" />
+    <ClInclude Include="GameSystem\Scene\Model\Model.h" />
     <ClInclude Include="GameSystem\Scene\Terrain\Frustum\Frustum.h" />
     <ClInclude Include="GameSystem\Manager.h" />
     <ClInclude Include="GameSystem\Noise\SimplexNoise.h" />
@@ -205,6 +206,7 @@
     <ClCompile Include="GameSystem\Camera\Camera.cpp" />
     <ClCompile Include="GameSystem\Direct3DManager\D3DManager.cpp" />
     <ClCompile Include="GameSystem\FPSManager\FPSManager.cpp" />
+    <ClCompile Include="GameSystem\Scene\Model\Model.cpp" />
     <ClCompile Include="GameSystem\Scene\Terrain\Frustum\Frustum.cpp" />
     <ClCompile Include="GameSystem\Noise\SimplexNoise.cpp" />
     <ClCompile Include="GameSystem\Scene\Light\Light.cpp" />
